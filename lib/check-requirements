@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if ! $(which aws) > /dev/null
+then
+    echo "Please install AWS-CLI"
+    exit 1
+fi

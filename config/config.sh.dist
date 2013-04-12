@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+declare -A CFN_PARAMS
+
+CFN_PARAMS['clusterName']="sparkie"
+CFN_PARAMS['ami']="ami-???????"
+CFN_PARAMS['promptColor']="yellow"
+CFN_PARAMS['sshKey']="ec2instances"
+CFN_PARAMS['notifyEmail']="<yourname>@celtra.com"
+CFN_PARAMS['availabilityZone']="us-east-1a"
+CFN_PARAMS['masterInstanceType']="m1.small"
+CFN_PARAMS['slaveInstanceType']="m1.xlarge"
+CFN_PARAMS['slaveAutoScalingMin']="1"
+CFN_PARAMS['slaveAutoScalingMax']="4"
+CFN_PARAMS['sumoUsername']="<sumoUsername"
+CFN_PARAMS['sumoPassword']="<sumoPassword>"

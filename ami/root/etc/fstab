@@ -1,0 +1,4 @@
+/dev/xvda1 /     ext3    defaults 1 1
+/dev/xvda2 /tmp  ext3    defaults 0 0
+none       /proc proc    defaults 0 0
+none       /sys  sysfs   defaults 0 0

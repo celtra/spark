@@ -1,4 +1,6 @@
-sparkie
-=======
+Sparkie - The Simple Spark Cluster EC2 Manager
+==============================================
 
-Spark Cluster AWS Management Scripts
+Hi.
+
+Bye.

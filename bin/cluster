@@ -1,0 +1,17 @@
+#!/bin/bash
+set -eu -o pipefail
+
+APP_ROOT=$(dirname $(dirname $(readlink -e $0)))
+source $APP_ROOT/config/config.sh
+source $APP_ROOT/lib/common.sh
+
+CMD=${1:-help}
+
+[ $# -gt 0 ] && shift
+
+if [ -f $APP_ROOT/lib/modules/cluster-${CMD}.sh ]
+then
+    $APP_ROOT/lib/modules/cluster-${CMD}.sh $@
+else
+    $APP_ROOT/lib/modules/cluster-help.sh $@
+fi

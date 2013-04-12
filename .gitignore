@@ -1,0 +1,8 @@
+config/config.sh
+tmp
+*~
+._*
+.DS_Store
+.project
+*.sublime-project
+*.sublime-workspace

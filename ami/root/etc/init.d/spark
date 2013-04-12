@@ -1,0 +1,105 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          spark
+# Required-Start:    $local_fs $network rsyslog firstboot-setup
+# Required-Stop:
+# Should-Start:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: One-time app setup on first boot.
+### END INIT INFO
+set -eu -o pipefail
+
+do_config() {
+    curl --retry 3 --silent --show-error --fail --output /etc/user-data http://169.254.169.254/2008-02-01/user-data
+    source /etc/user-data
+
+    MEM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
+    MEM=$[(MEM_KB - 1024 * 1024) / 1024]
+    MEMG=$[MEM / 1024]
+    MEM_SPARK=$[(MEM-1024)]
+
+    if [ $MEM_SPARK -lt 1024 ]
+    then
+        MEM_SPARK=1024
+    fi
+
+    echo "export SCALA_HOME='/opt/scala-2.9.2'" > /opt/spark/conf/spark-env.sh
+
+    if [ $MEMG -le 32 ]
+    then
+        echo 'export SPARK_JAVA_OPTS="-Dspark.local.dir=/tmp -Dspark.storage.memoryFraction=0.5 -Dspark.default.parallelism=64 -XX:+UseCompressedOops -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps ${SPARK_JAVA_OPTS}"' >> /opt/spark/conf/spark-env.sh
+    else
+        echo 'export SPARK_JAVA_OPTS="-Dspark.local.dir=/tmp -Dspark.storage.memoryFraction=0.5 -Dspark.default.parallelism=64 -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps ${SPARK_JAVA_OPTS}"' >> /opt/spark/conf/spark-env.sh
+    fi
+
+    if [ "$SERVER_ROLE" = 'master' ]
+    then
+        MASTER_IP=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/public-hostname)
+        echo "export SPARK_MASTER_IP=$MASTER_IP" >> /opt/spark/conf/spark-env.sh
+        echo "export SPARK_MEM=${MEM_SPARK}m" >> /opt/spark/conf/spark-env.sh
+
+        curl -X PUT -H 'Content-Type:' --data-binary "{\"Status\" : \"SUCCESS\",\"Reason\" : \"Configuration Complete\",\"UniqueId\" : \"ID1234\",\"Data\" : \"${MASTER_IP}\"}"  "$SIGNAL_URL"
+    else
+        PUBLIC_DNS=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/public-hostname)
+        echo "export SPARK_PUBLIC_DNS=$PUBLIC_DNS" >> /opt/spark/conf/spark-env.sh
+        echo "export SPARK_MEM=${MEM_SPARK}m" >> /opt/spark/conf/spark-env.sh
+        echo "export SPARK_WORKER_DIR=/tmp/spark-work" >> /opt/spark/conf/spark-env.sh
+        #SPARK_MASTER_PORT
+        #SPARK_MASTER_WEBUI_PORT, to use non-default ports
+        #SPARK_WORKER_CORES, to set the number of cores to use on this machine
+        #SPARK_WORKER_MEMORY, to set how much memory to use (e.g. 1000m, 2g)
+        #SPARK_WORKER_PORT
+        #SPARK_WORKER_WEBUI_PORT
+    fi
+
+    chmod 755 /opt/spark/conf/spark-env.sh
+}
+
+do_start() {
+    source /etc/user-data
+    MASTER_IP=$(echo $MASTER_IP | sed -ne "s/.*:\(.*\)\}/\1/p")
+
+    if [ "$SERVER_ROLE" = 'master' ]
+    then
+        /opt/spark/bin/start-master.sh
+    else
+        /opt/spark/bin/start-slave.sh spark://$MASTER_IP:7077
+    fi
+}
+
+do_stop() {
+    source /etc/user-data
+    if [ "$SERVER_ROLE" = "master" ]
+    then
+        if [ -f /tmp/spark--spark.deploy.master.Master.pid ]
+        then
+            pid=$(cat /tmp/spark--spark.deploy.master.Master.pid)
+            kill $pid
+        fi
+    else
+        if [ -f /tmp/spark--spark.deploy.worker.Worker.pid ]
+        then
+            pid=$(cat /tmp/spark--spark.deploy.worker.Worker.pid)
+            kill $pid
+        fi
+    fi
+}
+
+case $1 in
+    start)
+        do_config
+        do_start
+        ;;
+    stop)
+        do_stop
+        ;;
+    restart)
+        do_stop
+        do_start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        ;;
+esac
