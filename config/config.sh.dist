@@ -4,8 +4,9 @@ set -eu -o pipefail
 
 declare -A CFN_PARAMS
 
+##
+# Stack template parameters
 CFN_PARAMS['clusterName']="sparkie"
-CFN_PARAMS['ami']="ami-???????"
 CFN_PARAMS['promptColor']="yellow"
 CFN_PARAMS['sshKey']="ec2instances"
 CFN_PARAMS['notifyEmail']="<yourname>@celtra.com"
@@ -16,3 +17,7 @@ CFN_PARAMS['slaveAutoScalingMin']="1"
 CFN_PARAMS['slaveAutoScalingMax']="4"
 CFN_PARAMS['sumoUsername']="<sumoUsername"
 CFN_PARAMS['sumoPassword']="<sumoPassword>"
+
+##
+# Various other
+S3_AMI_BUCKET="celtra-test-ami"

@@ -21,19 +21,11 @@
 
 # Error handling
 set -eu -o pipefail
-APP_ROOT=$(dirname $(dirname $(dirname $(readlink -e $0))))
+APP_ROOT=$(dirname $(dirname $(readlink -e $0)))
 
 fail() {
     echo "$(basename $0): error: $1" >&2
     exit 1
-}
-
-MODULE_NAME="build-ami"
-MODULE_DESCRIPTION="Create Amazon AWS AMI"
-
-base-ami-hash() {
-    cd "$AMI_ROOT"
-    find ./ -exec sh -c "if [ -f '{}' ]; then cat '{}'; else echo '{}'; fi" \; | md5sum | cut -d' ' -f1
 }
 
 # Paths
@@ -47,7 +39,6 @@ BASE_IMAGE_CACHE_DIR=
 AMI_ID_FILE=
 S3_BUCKET=celtra-test-ami
 SPARK_VERSION="v0.6.2"
-VERSION=2
 
 while getopts ":hr:a:B:bc:o:" opt; do
     case $opt in
@@ -111,22 +102,21 @@ fi
 IMAGE_NAME="spark-0.6.2"
 
 #  - revision
-#VERSION="$( cd $APP_ROOT; git rev-parse HEAD | cut -b 1-10 )"
-#VERSION=$(base-ami-hash)
-#if [ $(cd $APP_ROOT; git status --porcelain | wc -l) -ne 0 ]
-#then
-#    VERSION+="_$(date +%Y%m%d%H%I%S)"
-#    echo "Working copy has modifications (version will be '$VERSION'):"
-#    echo
-#    (cd "$APP_ROOT"; git status)
-#    echo
-#    
-#    if [ $BATCH != 1 ]
-#    then
-#        echo "Continue? (ctrl-c to cancel)"
-#        read
-#    fi
-#fi
+VERSION=$($APP_ROOT/ami/base-ami-hash)
+if [ $(cd $APP_ROOT; git status --porcelain | wc -l) -ne 0 ]
+then
+    VERSION+="_$(date +%Y%m%d%H%I%S)"
+    echo "Working copy has modifications (version will be '$VERSION'):"
+    echo
+    (cd "$APP_ROOT"; git status)
+    echo
+    
+    if [ $BATCH != 1 ]
+    then
+        echo "Continue? (ctrl-c to cancel)"
+        read
+    fi
+fi
 IMAGE_NAME+="-$VERSION"
 
 #  - suffix
@@ -158,7 +148,7 @@ function c() {
 # copy, or caching will not work correctly!
 #
 
-BASE_IMAGE_PATH="${BASE_IMAGE_CACHE_DIR:-$TMPDIR}/base-$(base-ami-hash).img"
+BASE_IMAGE_PATH="${BASE_IMAGE_CACHE_DIR:-$TMPDIR}/base-$($APP_ROOT/ami/base-ami-hash).img"
 if [ -e $BASE_IMAGE_PATH ]
 then
     echo "Using an existing base image."
@@ -313,13 +303,12 @@ ec2-upload-bundle \
     >/dev/null
 
 echo "Registering the AMI..."
-ec2-register \
-    --region ${EC2_REGION} \
-    $S3_BUCKET/$IMAGE_NAME/$IMAGE_NAME.manifest.xml \
+aws ec2 register-image \
+    --image-location $S3_BUCKET/$IMAGE_NAME/$IMAGE_NAME.manifest.xml \
     --name ${IMAGE_NAME} \
     --description ${IMAGE_NAME} \
     >$TMPDIR/ret
-IMAGE=$(cut -f 2 <$TMPDIR/ret)
+IMAGE=$($APP_ROOT/lib/jsawk -n 'out(this.ImageId)' < $TMPDIR/ret)
 
 echo "Cleaning up..."
 rm -r $TMPDIR
