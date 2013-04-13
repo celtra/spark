@@ -67,7 +67,7 @@ aws_get_instances() {
     aws ec2 describe-instances \
         --filters "$FILTERS" | \
         tr -d '\n' | \
-        sed -ne 's/^\(.*}\)[^}]*$/\1/p' | \
+        sed -ne 's/^\(.*}]*\)[^}]*$/\1/p' | \
         $APP_ROOT/lib/jsawk -n 'for (var i = 0; i < this.Reservations.length; i++) { for (j = 0; j < this.Reservations[i].Instances.length; j++) { out(this.Reservations[i].Instances[j].InstanceId + " " + this.Reservations[i].Instances[j].PublicDnsName); } }'
 }
 
@@ -80,6 +80,6 @@ aws_get_instance_by_id() {
 aws_get_stack_status() {
     aws cloudformation describe-stacks --stack-name $CFN_CLUSTER_NAME | \
     tr -d '\n' | \
-    sed -ne 's/^\(.*}\)[^}]*$/\1/p' | \
-    $APP_ROOT/lib/jsawk -n 'if (typeof this.ErrorResponse != "undefined" ) { out(this.ErrorResponse.Error.Message); } else { out(this.Stacks[0].StackStatus); }'
+    sed -ne 's/^\(.*}]*\)[^}]*$/\1/p' | \
+    $APP_ROOT/lib/jsawk -n 'if (typeof this.ErrorResponse != "undefined" ) { out(this.ErrorResponse.Error.Message); } else { out(this.StackStatus); }'
 }
