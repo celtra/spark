@@ -11,7 +11,7 @@ CMD=${1:-help}
 
 if [ -f $APP_ROOT/lib/modules/cluster-${CMD}.sh ]
 then
-    $APP_ROOT/lib/modules/cluster-${CMD}.sh $@
+    $APP_ROOT/lib/modules/cluster-${CMD}.sh "$@"
 else
-    $APP_ROOT/lib/modules/cluster-help.sh $@
+    $APP_ROOT/lib/modules/cluster-help.sh "$@"
 fi
