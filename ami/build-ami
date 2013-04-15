@@ -99,7 +99,7 @@ fi
 
 # Decide on image name (pattern: appserver-x86_64-r1234M_20110719121201-suffix)
 #  - base
-IMAGE_NAME="spark-0.6.2"
+IMAGE_NAME="spark-${SPARK_VERSION}"
 
 #  - revision
 VERSION=$($APP_ROOT/ami/base-ami-hash)
