@@ -31,7 +31,7 @@ do_config() {
     then
         echo 'export SPARK_JAVA_OPTS="-Dspark.local.dir=/tmp -Dspark.storage.memoryFraction=0.5 -Dspark.default.parallelism=64 -XX:+UseCompressedOops -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps ${SPARK_JAVA_OPTS}"' >> /opt/spark/conf/spark-env.sh
     else
-        echo 'export SPARK_JAVA_OPTS="-Dspark.local.dir=/tmp -Dspark.storage.memoryFraction=0.5 -Dspark.default.parallelism=64 -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps ${SPARK_JAVA_OPTS}"' >> /opt/spark/conf/spark-env.sh
+        echo 'export SPARK_JAVA_OPTS="-Dspark.local.dir=/tmp -Dspark.storage.memoryFraction=0.5 -Dspark.default.parallelism=64                        -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps ${SPARK_JAVA_OPTS}"' >> /opt/spark/conf/spark-env.sh
     fi
 
     if [ "$SERVER_ROLE" = 'master' ]
@@ -40,7 +40,7 @@ do_config() {
         echo "export SPARK_MASTER_IP=$MASTER_IP" >> /opt/spark/conf/spark-env.sh
         echo "export SPARK_MEM=${MEM_SPARK}m" >> /opt/spark/conf/spark-env.sh
 
-        curl -X PUT -H 'Content-Type:' --data-binary "{\"Status\" : \"SUCCESS\",\"Reason\" : \"Configuration Complete\",\"UniqueId\" : \"ID1234\",\"Data\" : \"${MASTER_IP}\"}"  "$SIGNAL_URL"
+        curl --silent -X PUT -H 'Content-Type:' --data-binary "{\"Status\" : \"SUCCESS\",\"Reason\" : \"Configuration Complete\",\"UniqueId\" : \"ID1234\",\"Data\" : \"${MASTER_IP}\"}"  "$SIGNAL_URL"
     else
         PUBLIC_DNS=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/public-hostname)
         echo "export SPARK_PUBLIC_DNS=$PUBLIC_DNS" >> /opt/spark/conf/spark-env.sh
@@ -58,6 +58,7 @@ do_config() {
 }
 
 do_start() {
+    echo "Starting spark"
     source /etc/user-data
 
     if [ "$SERVER_ROLE" = 'master' ]
@@ -70,31 +71,10 @@ do_start() {
 }
 
 do_stop() {
+    echo "Stopping Spark"
     source /etc/user-data
-    if [ "$SERVER_ROLE" = "master" ]
-    then
-        if [ -f /tmp/spark--spark.deploy.master.Master.pid ]
-        then
-            pid=$(cat /tmp/spark--spark.deploy.master.Master.pid)
-            if $(ps $pid >/dev/null 2>&1)
-            then
-                kill $pid
-            else
-                rm /tmp/spark--spark.deploy.master.Master.pid
-            fi
-        fi
-    else
-        if [ -f /tmp/spark--spark.deploy.worker.Worker.pid ]
-        then
-            pid=$(cat /tmp/spark--spark.deploy.worker.Worker.pid)
-            if $(ps $pid >/dev/null 2>&1)
-            then
-                kill $pid
-            else
-                rm /tmp/spark--spark.deploy.worker.Worker.pid
-            fi
-        fi
-    fi
+    kill -9 $(pgrep -f "java.*spark")
+    rm -fr /tmp/spark-local*
 }
 
 case $1 in
