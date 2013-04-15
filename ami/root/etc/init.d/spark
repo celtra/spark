@@ -59,12 +59,12 @@ do_config() {
 
 do_start() {
     source /etc/user-data
-    MASTER_IP=$(echo $MASTER_IP | sed -ne "s/.*:\(.*\)\}/\1/p")
 
     if [ "$SERVER_ROLE" = 'master' ]
     then
         /opt/spark/bin/start-master.sh
     else
+        MASTER_IP=$(echo $MASTER_IP | sed -ne "s/.*:\(.*\)\}/\1/p")
         /opt/spark/bin/start-slave.sh spark://$MASTER_IP:7077
     fi
 }
@@ -76,13 +76,23 @@ do_stop() {
         if [ -f /tmp/spark--spark.deploy.master.Master.pid ]
         then
             pid=$(cat /tmp/spark--spark.deploy.master.Master.pid)
-            kill $pid
+            if $(ps $pid >/dev/null 2>&1)
+            then
+                kill $pid
+            else
+                rm /tmp/spark--spark.deploy.master.Master.pid
+            fi
         fi
     else
         if [ -f /tmp/spark--spark.deploy.worker.Worker.pid ]
         then
             pid=$(cat /tmp/spark--spark.deploy.worker.Worker.pid)
-            kill $pid
+            if $(ps $pid >/dev/null 2>&1)
+            then
+                kill $pid
+            else
+                rm /tmp/spark--spark.deploy.worker.Worker.pid
+            fi
         fi
     fi
 }
