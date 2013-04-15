@@ -38,7 +38,7 @@ BATCH=0
 BASE_IMAGE_CACHE_DIR=
 AMI_ID_FILE=
 S3_BUCKET=celtra-test-ami
-SPARK_VERSION="v0.6.2"
+SPARK_VERSION="v0.7.0"
 
 while getopts ":hr:a:B:bc:o:" opt; do
     case $opt in
