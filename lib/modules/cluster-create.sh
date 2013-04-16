@@ -27,7 +27,7 @@ AMI_BUCKET_ID=$(aws ec2 describe-images --filters "[ { \"name\": \"is-public\", 
 
 if [ "$AMI_BUCKET_ID" == "" ]
 then
-    sudo env PATH=$PATH $APP_ROOT/ami/build-ami -b -B $S3_AMI_BUCKET -o $TMP_DIR/ami.id
+    sudo_cmd $APP_ROOT/ami/build-ami -b -B $S3_AMI_BUCKET -o $TMP_DIR/ami.id
     AMI_ID=$(cat $TMP_DIR/ami.id | awk '{ print $2; }')
 else
     AMI_ID=$AMI_BUCKET_ID

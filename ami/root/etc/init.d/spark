@@ -73,7 +73,7 @@ do_start() {
 do_stop() {
     echo "Stopping Spark"
     source /etc/user-data
-    kill -9 $(pgrep -f "java.*spark")
+    kill -9 $(pgrep -f "java.*spark") > /dev/null 2>&1 || true
     rm -fr /tmp/spark-local*
 }
 

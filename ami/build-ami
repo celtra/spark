@@ -303,12 +303,17 @@ ec2-upload-bundle \
     >/dev/null
 
 echo "Registering the AMI..."
-aws ec2 register-image \
+if aws ec2 register-image \
     --image-location $S3_BUCKET/$IMAGE_NAME/$IMAGE_NAME.manifest.xml \
     --name ${IMAGE_NAME} \
     --description ${IMAGE_NAME} \
     >$TMPDIR/ret
-IMAGE=$($APP_ROOT/lib/jsawk -n 'out(this.ImageId)' < $TMPDIR/ret)
+then
+    IMAGE=$($APP_ROOT/lib/jsawk -n 'out(this.ImageId)' < $TMPDIR/ret)
+else
+    cat $TMPDIR/ret
+    exit 1
+fi
 
 echo "Cleaning up..."
 rm -r $TMPDIR

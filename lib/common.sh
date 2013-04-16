@@ -13,6 +13,11 @@ error() {
     exit 1
 }
 
+sudo_cmd() {
+    sudo env PATH=$PATH AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+        AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY "$@"
+}
+
 aws_generate_parameters_json() {
     PARAMS="["
     for param in ${!CFN_PARAMS[@]}
