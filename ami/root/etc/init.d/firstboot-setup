@@ -29,9 +29,9 @@ PS1="\[${colors['$COLOR']}\]\u@\h:\w\[$BOLD\]\\\$\[$RESET\] "
 ' >>/root/.profile
 fi
 
-INSTANCE_ID="${SERVER_ROLE}-$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/instance-id)"
+INSTANCE_ID=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/instance-id)
 # Fix SumoConfig
-for var in $(cat /opt/SumoCollector/config/wrapper.conf |  sed -ne "s/.*\$\$\(.*\)\$\$.*/\1/p")
+for var in $(cat /opt/SumoCollector/config/wrapper.conf |  grep -Po '\$\$([^\$]*)\$\$*' | tr -d '$')
 do
     key=${var//$/\\$}
     key=${key//\[/\\[}

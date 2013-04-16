@@ -198,7 +198,7 @@ else
     
     echo "  - Installing packages..."
     PACKAGES=""
-    PACKAGES+=" linux-image-xen-amd64 dhcpcd resolvconf openssh-server"                                             # base
+    PACKAGES+=" linux-image-xen-amd64 dhcpcd resolvconf openssh-server libpcre3"                                     # base
     PACKAGES+=" sudo joe less zip unzip host iptraf curl vim"                                                       # admin tools
     PACKAGES+=" psmisc strace lsof ntp sun-java6-jdk"                                                               # more admin tools
 
