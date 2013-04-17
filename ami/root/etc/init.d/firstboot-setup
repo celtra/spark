@@ -29,6 +29,33 @@ PS1="\[${colors['$COLOR']}\]\u@\h:\w\[$BOLD\]\\\$\[$RESET\] "
 ' >>/root/.profile
 fi
 
+## tmp RAID0 setup
+echo "Setting up RAID0"
+declare -a DEVICES=( $(find /dev -maxdepth 1 -regex '.*xvd[bcde]') )
+for device in "${DEVICES[@]}"
+do
+    echo "  - Creating RAID partition on $device"
+    parted -s $device rm 1 || true
+    parted -s $device mklabel msdos
+    parted -s -a optimal $device unit % mkpart primary 0% 100%
+    parted -s $device set 1 raid on
+done
+echo "  - Creating RAID0 /dev/md0 device"
+declare -a DEVICES=( $(find /dev -maxdepth 1 -regex '.*xvd[bcde]1') )
+mdadm --create /dev/md0 --force --raid-devices=${#DEVICES[@]} --level=raid0 ${DEVICES[@]}
+echo "DEVICE ${DEVICES}" > /etc/mdadm/mdadm.conf
+echo "CREATE owner=root group=disk mode=0600 auto=yes" >> /etc/mdadm/mdadm.conf
+echo "HOMEHOST <system>" >> /etc/mdadm/mdadm.conf
+echo "MAILADDR root" >> /etc/mdadm/mdadm.conf
+# Have to wait here a bit or shit wont work
+sleep 5
+mdadm --detail --scan >> /etc/mdadm/mdadm.conf
+echo "  - Creating EXT4 filesystem"
+mkfs.ext4 -q -m 0 -O ^has_journal -O dir_index /dev/md0
+echo "  - Mounting /dev/md0 to /tmp"
+echo "/dev/md0   /tmp  ext4    noatime,nodiratime,noacl,nouser_xattr,data=writeback,barrier=0,nobh 0 0" >> /etc/fstab
+mount /tmp
+
 INSTANCE_ID=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/instance-id)
 # Fix SumoConfig
 for var in $(cat /opt/SumoCollector/config/wrapper.conf |  grep -Po '\$\$([^\$]*)\$\$*' | tr -d '$')
