@@ -29,9 +29,9 @@ do_config() {
 
     if [ $MEMG -le 32 ]
     then
-        echo 'export SPARK_JAVA_OPTS="-Dspark.storage.blockManagerHeartBeatMs=300000 -Dspark.local.dir=/tmp -Dspark.storage.memoryFraction=0.5 -Dspark.default.parallelism=64 -XX:+UseCompressedOops -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps ${SPARK_JAVA_OPTS}"' >> /opt/spark/conf/spark-env.sh
+        echo 'export SPARK_JAVA_OPTS="-Dspark.local.dir=/tmp -XX:+UseCompressedOops -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps ${SPARK_JAVA_OPTS}"' >> /opt/spark/conf/spark-env.sh
     else
-        echo 'export SPARK_JAVA_OPTS="-Dspark.storage.blockManagerHeartBeatMs=300000 -Dspark.local.dir=/tmp -Dspark.storage.memoryFraction=0.5 -Dspark.default.parallelism=64                        -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps ${SPARK_JAVA_OPTS}"' >> /opt/spark/conf/spark-env.sh
+        echo 'export SPARK_JAVA_OPTS="-Dspark.local.dir=/tmp                        -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps ${SPARK_JAVA_OPTS}"' >> /opt/spark/conf/spark-env.sh
     fi
 
     if [ "$SERVER_ROLE" = 'master' ]
@@ -74,7 +74,6 @@ do_stop() {
     echo "Stopping Spark"
     source /etc/user-data
     kill -9 $(pgrep -f "java.*spark") > /dev/null 2>&1 || true
-    rm -fr /tmp/spark-local*
 }
 
 case $1 in

@@ -47,9 +47,9 @@ then
     # lib/prefix somewhat broken atm
     if [ "$QUIET" == "true" ]
     then
-        parallel -j 99 -i ssh -o StrictHostKeyChecking=no -l root {} "$COMMAND" --  $INSTANCES
+        parallel -j 99 -i ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root {} "$COMMAND" --  $INSTANCES
     else
-        parallel -j 99 -i $APP_ROOT/lib/prefix "{}: " ssh -o StrictHostKeyChecking=no -l root {} "$COMMAND" --  $INSTANCES
+        parallel -j 99 -i $APP_ROOT/lib/prefix "{}: " ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root {} "$COMMAND" --  $INSTANCES
     fi
 else
     error "No instances found."
