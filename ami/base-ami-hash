@@ -3,5 +3,5 @@ set -eu -o pipefail
 
 APP_ROOT=$(dirname $(dirname $(readlink -e $0)))
 
-cd "$APP_ROOT/ami/root"
+cd "$APP_ROOT/ami"
 find ./ -exec sh -c "if [ -f '{}' ]; then cat '{}'; else echo '{}'; fi" \; | md5sum | cut -d' ' -f1
