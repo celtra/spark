@@ -105,12 +105,16 @@ template = ->
                         FromPort: 22
                         ToPort: 22
                         CidrIp: '0.0.0.0/0'
-                    },{
-                        SourceSecurityGroupName: { Ref: 'SlaveSecurityGroup' }
-                        IpProtocol: 'tcp'
-                        FromPort: '7077'
-                        ToPort: '7077'
                     }]
+            
+            MasterSecurityGroupIngress:
+                Type: 'AWS::EC2::SecurityGroupIngress'
+                Properties:
+                    GroupName: { Ref: 'MasterSecurityGroup' }
+                    SourceSecurityGroupName: { Ref: 'SlaveSecurityGroup' }
+                    IpProtocol: 'tcp'
+                    FromPort: '7077'
+                    ToPort: '7077'
 
             SlaveSecurityGroup:
                 Type: 'AWS::EC2::SecurityGroup'
@@ -127,6 +131,24 @@ template = ->
                         ToPort: 8081
                         CidrIp: '89.143.12.238/32'
                     }]
+                    
+            SlaveSecurityGroupIngress1:
+                Type: 'AWS::EC2::SecurityGroupIngress'
+                Properties:
+                    GroupName: { Ref: 'SlaveSecurityGroup' }
+                    SourceSecurityGroupName: { Ref: 'MasterSecurityGroup' }
+                    IpProtocol: 'tcp'
+                    FromPort: 7077
+                    ToPort: 7077
+                    
+            SlaveSecurityGroupIngress2:
+                Type: 'AWS::EC2::SecurityGroupIngress'
+                Properties:
+                    GroupName: { Ref: 'SlaveSecurityGroup' }
+                    SourceSecurityGroupName: { Ref: 'SlaveSecurityGroup' }
+                    IpProtocol: 'tcp'
+                    FromPort: 0
+                    ToPort: 65535
 
             MasterNode:
                 Type: 'AWS::EC2::Instance'
@@ -134,7 +156,7 @@ template = ->
                     AvailabilityZone: {Ref: 'availabilityZone'}
                     ImageId: {Ref: 'ami'}
                     InstanceType: {Ref: "masterInstanceType"}
-                    SecurityGroups: ['default', {Ref: 'MasterSecurityGroup'}]
+                    SecurityGroups: ['default', {Ref: 'MasterSecurityGroup'}, 'rds-client', 'vertica-client']
                     KeyName: {Ref: 'sshKey'}
                     UserData: {'Fn::Base64': {'Fn::Join': [ "", [
                         "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
@@ -149,7 +171,7 @@ template = ->
                 Type: 'AWS::AutoScaling::LaunchConfiguration'
                 Properties:
                     ImageId: {Ref: 'ami'}
-                    SecurityGroups: ['default', {Ref: 'SlaveSecurityGroup'}]
+                    SecurityGroups: ['default', {Ref: 'SlaveSecurityGroup'}, 'rds-client', 'vertica-client']
                     InstanceType: {Ref: "slaveInstanceType"}
                     KeyName: {Ref: 'sshKey'}
                     UserData: {'Fn::Base64': {'Fn::Join': [ "", [
