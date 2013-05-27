@@ -156,7 +156,7 @@ template = ->
                     AvailabilityZone: {Ref: 'availabilityZone'}
                     ImageId: {Ref: 'ami'}
                     InstanceType: {Ref: "masterInstanceType"}
-                    SecurityGroups: ['default', {Ref: 'MasterSecurityGroup'}, 'rds-client', 'vertica-client']
+                    SecurityGroups: ['default', {Ref: 'MasterSecurityGroup'}]
                     KeyName: {Ref: 'sshKey'}
                     UserData: {'Fn::Base64': {'Fn::Join': [ "", [
                         "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
@@ -171,7 +171,7 @@ template = ->
                 Type: 'AWS::AutoScaling::LaunchConfiguration'
                 Properties:
                     ImageId: {Ref: 'ami'}
-                    SecurityGroups: ['default', {Ref: 'SlaveSecurityGroup'}, 'rds-client', 'vertica-client']
+                    SecurityGroups: ['default', {Ref: 'SlaveSecurityGroup'}]
                     InstanceType: {Ref: "slaveInstanceType"}
                     KeyName: {Ref: 'sshKey'}
                     UserData: {'Fn::Base64': {'Fn::Join': [ "", [

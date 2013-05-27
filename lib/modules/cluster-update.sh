@@ -51,7 +51,7 @@ fi
 CFN_PARAMS['ami']=$AMI_ID
 PARAMETERS=$(aws_generate_parameters_json)
 
-if DRY_RUN
+if $DRY_RUN
 then
     echo "aws cloudformation update-stack --template-body \"$TEMPLATE\" --parameters \"${PARAMETERS}\" --stack-name $CFN_CLUSTER_NAME"
 else
