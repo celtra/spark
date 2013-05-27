@@ -17,6 +17,21 @@ cleanup() {
 }
 trap cleanup EXIT
 
+DRY_RUN=false
+while getopts "hn" OPTION
+do
+     case $OPTION in
+         h)  usage
+             exit 1
+             ;;
+         n)  DRY_RUN=true
+             ;;
+         *)  usage
+             exit 1
+             ;;
+     esac
+done
+
 echo "Updating cluster $CFN_CLUSTER_NAME"
 
 # Local AMI Hash
@@ -36,9 +51,14 @@ fi
 CFN_PARAMS['ami']=$AMI_ID
 PARAMETERS=$(aws_generate_parameters_json)
 
-if OUTPUT=$(aws cloudformation update-stack --template-body "$TEMPLATE" --parameters "${PARAMETERS}" --stack-name $CFN_CLUSTER_NAME)
+if DRY_RUN
 then
-    aws_cfn_wait_for_quit_status "UPDATE_COMPLETE" "ROLLBACK_COMPLETE"
+    echo "aws cloudformation update-stack --template-body \"$TEMPLATE\" --parameters \"${PARAMETERS}\" --stack-name $CFN_CLUSTER_NAME"
 else
-    error "$OUTPUT"
+    if OUTPUT=$(aws cloudformation update-stack --template-body "$TEMPLATE" --parameters "${PARAMETERS}" --stack-name $CFN_CLUSTER_NAME)
+    then
+        aws_cfn_wait_for_quit_status "UPDATE_COMPLETE" "ROLLBACK_COMPLETE"
+    else
+        error "$OUTPUT"
+    fi
 fi
