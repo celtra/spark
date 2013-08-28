@@ -21,8 +21,8 @@ aws_generate_parameters_json() {
     PARAMS="["
     for param in ${!CFN_PARAMS[@]}
     do
-        PARAMS+="{ \"parameter_key\":   \"$param\","
-        PARAMS+="  \"parameter_value\": \"${CFN_PARAMS[$param]}\" },"
+        PARAMS+="{ \"ParameterKey\":   \"$param\","
+        PARAMS+="  \"ParameterValue\": \"${CFN_PARAMS[$param]}\" },"
     done
     PARAMS=${PARAMS%,}"]"
     echo $PARAMS
