@@ -38,7 +38,9 @@ BATCH=0
 BASE_IMAGE_CACHE_DIR=
 AMI_ID_FILE=
 S3_BUCKET=celtra-test-ami
-SPARK_VERSION="v0.7.0"
+SPARK_VERSION="v0.7.3"
+SCALA_VERSION="2.9.3"
+SUMO_VERSION="19.36-6"
 
 while getopts ":hr:a:B:bc:o:" opt; do
     case $opt in
@@ -210,11 +212,11 @@ else
     c apt-get -yqq remove avahi-daemon >/dev/null
     c dpkg --purge avahi-daemon >/dev/null
 
-    echo "  - Installing SumoLogic Collector"
-    wget -q "http://files.celtra.com.s3.amazonaws.com/sumologic/sumocollector_19.36-6_amd64.deb" -O $CHROOT/tmp/sumocollector_19.36-6_amd64.deb
+    echo "  - Installing SumoLogic Collector ${SUMO_VERSION}"
+    wget -q "http://files.celtra.com.s3.amazonaws.com/sumologic/sumocollector_${SUMO_VERSION}_amd64.deb" -O $CHROOT/tmp/sumocollector_${SUMO_VERSION}_amd64.deb
     # Install will bork if we have wrapper.conf already in place
     c rm -fr /opt/SumoCollector
-    c dpkg -i /tmp/sumocollector_19.36-6_amd64.deb > /dev/null
+    c dpkg -i /tmp/sumocollector_${SUMO_VERSION}_amd64.deb > /dev/null
     cp "$AMI_ROOT/opt/SumoCollector/config/wrapper.conf" $CHROOT/opt/SumoCollector/config/wrapper.conf
     c usermod -a -G adm sumo
     c insserv -d collector
@@ -228,10 +230,11 @@ else
     rm -fr .git
     cp -rp $TMPDIR/spark $CHROOT/opt/ > /dev/null
     
-    echo "  - Installing Scala 2.9.2"
-    wget http://www.scala-lang.org/downloads/distrib/files/scala-2.9.2.tgz -o /dev/null -O $TMPDIR/scala-2.9.2.tgz
+    echo "  - Installing Scala ${SCALA_VERSION}"
+    wget http://www.scala-lang.org/downloads/distrib/files/scala-${SCALA_VERSION}.tgz -o /dev/null -O $TMPDIR/scala-${SCALA_VERSION}.tgz
     cd $CHROOT/opt
-    tar xzf $TMPDIR/scala-2.9.2.tgz
+    tar xzf $TMPDIR/scala-${SCALA_VERSION}.tgz
+    c ln -s /opt/scala-${SCALA_VERSION} /opt/scala
     cd - > /dev/null
     
     rm $CHROOT/usr/sbin/policy-rc.d
