@@ -61,10 +61,10 @@ aws_cfn_wait_for_quit_status() {
 # Return a list of AWS instance IDs and PublicDNSNames
 aws_get_instances() {
     ROLE=${1:-}
-    [ "$ROLE" != "" ] && ROLE_FILTERS=",{\"name\": \"tag:aws:cloudformation:logical-id\", \"values\": [\"$ROLE*\"] }" || ROLE_FILTERS=
+    [ "$ROLE" != "" ] && ROLE_FILTERS=",Name=tag:aws:cloudformation:logical-id,Values=\"$ROLE*\"" || ROLE_FILTERS=
 
-    FILTERS="[{ \"name\": \"tag:aws:cloudformation:stack-name\", \"values\": [\"$CFN_CLUSTER_NAME\"] },"
-    FILTERS+='{ "name": "instance-state-name", "values": ["running"] }'
+    FILTERS="Name=tag:aws:cloudformation:stack-name,Values=\"$CFN_CLUSTER_NAME\","
+    FILTERS+='Name=instance-state-name,Values=running'
     FILTERS+="${ROLE_FILTERS}]"
 
     FILTERS=$(tr -d '\n' <<< $FILTERS)

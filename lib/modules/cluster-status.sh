@@ -26,7 +26,7 @@ CPU_UTILIZATION=$(cluster run -r Slave ps aux | grep -P "java.*Schedule" | awk '
 echo "Spark Cluster $CFN_CLUSTER_NAME"
 echo "==========================="
 echo "- Cluster Status:       $(aws_get_stack_status)"
-echo "- Cluster ScalingGroup: $(aws cloudformation list-stack-resources --stack-name=$CFN_CLUSTER_NAME | ../lib/jsawk -n 'if (this.ResourceType == "AWS::AutoScaling::AutoScalingGroup") { out(this.PhysicalResourceId);}')"
+echo "- Cluster ScalingGroup: $(aws cloudformation list-stack-resources --stack-name=$CFN_CLUSTER_NAME | $APP_ROOT/lib/jsawk -n 'if (this.ResourceType == "AWS::AutoScaling::AutoScalingGroup") { out(this.PhysicalResourceId);}')"
 echo ""
 echo "- Master"
 echo "  - Master URL:          http://${MASTER_URL}:8080"
