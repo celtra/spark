@@ -231,7 +231,7 @@ else
     cp -rp $TMPDIR/spark $CHROOT/opt/ > /dev/null
     
     echo "  - Installing Scala ${SCALA_VERSION}"
-    wget http://www.scala-lang.org/downloads/distrib/files/scala-${SCALA_VERSION}.tgz -o /dev/null -O $TMPDIR/scala-${SCALA_VERSION}.tgz
+    wget http://www.scala-lang.org/files/archive/scala-${SCALA_VERSION}.tgz -o /dev/null -O $TMPDIR/scala-${SCALA_VERSION}.tgz
     cd $CHROOT/opt
     tar xzf $TMPDIR/scala-${SCALA_VERSION}.tgz
     c ln -s /opt/scala-${SCALA_VERSION} /opt/scala
