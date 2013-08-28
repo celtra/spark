@@ -37,7 +37,7 @@ echo "Updating cluster $CFN_CLUSTER_NAME"
 # Local AMI Hash
 AMI_HASH_ID=$($APP_ROOT/ami/base-ami-hash)
 # Currently deployed AMI_ID
-AMI_BUCKET_ID=$(aws ec2 describe-images --filters "[ { \"name\": \"is-public\", \"values\": [ \"false\" ] },{ \"name\": \"name\", \"values\": [ \"spark-*-${AMI_HASH_ID}\" ] } ]" | \
+AMI_BUCKET_ID=$(aws ec2 describe-images --filters Name=is-public,Values=false,Name=name,Values=spark-*-${AMI_HASH_ID} | \
                 $APP_ROOT/lib/jsawk -n 'if (typeof this.Images[0] != "undefined") { out(this.Images[0].ImageId); }')
 
 if [ "$AMI_BUCKET_ID" == "" ]
