@@ -66,7 +66,7 @@ do_start() {
         /opt/spark/bin/start-master.sh
     else
         MASTER_IP=$(echo $MASTER_IP | sed -ne "s/.*:\(.*\)\}/\1/p")
-        /opt/spark/bin/start-slave.sh spark://$MASTER_IP:7077
+        /opt/spark/bin/start-slave.sh 1 spark://$MASTER_IP:7077
     fi
 }
 
