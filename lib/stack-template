@@ -89,7 +89,7 @@ template = ->
                     
             SlaveWaitCondition:
                 Type: 'AWS::CloudFormation::WaitCondition'
-                DependsOn: 'MasterNode'
+                DependsOn: 'MasterScalingGroup'
                 Properties:
                     Handle: { Ref: 'SlaveWaitHandle' }
                     Timeout: '4500'
