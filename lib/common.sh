@@ -83,5 +83,5 @@ aws_get_stack_status() {
     aws cloudformation describe-stacks --stack-name $CFN_CLUSTER_NAME | \
     tr -d '\n' | \
     sed -ne 's/^\(.*}]*\)[^}]*$/\1/p' | \
-    $APP_ROOT/lib/jsawk -n 'if (typeof this.ErrorResponse != "undefined" ) { out(this.ErrorResponse.Error.Message); } else { out(this.StackStatus); }'
+    $APP_ROOT/lib/jsawk -n 'if (typeof this.ErrorResponse != "undefined" ) { out(this.ErrorResponse.Error.Message); } else { out(this.Stacks[0].StackStatus); }'
 }
