@@ -186,6 +186,11 @@ template = ->
             
             SlaveScalingGroup:
                 Type: 'AWS::AutoScaling::AutoScalingGroup'
+                UpdatePolicy:
+                    AutoScalingRollingUpdate:
+                        MinInstancesInService : "0",
+                        MaxBatchSize : "32",
+                        PauseTime : "PT0M"
                 Properties:
                     AvailabilityZones:  [ {Ref: 'availabilityZone'} ]
                     LaunchConfigurationName: {Ref: "SlaveLaunchConfig"}
