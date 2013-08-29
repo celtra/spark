@@ -45,12 +45,12 @@ template = ->
                 Type: 'String'
 
             slaveAutoScalingMin:
-                Description: 'Min number of servers in Hub AutoScalingGroup.'
+                Description: 'Min number of servers in Slave AutoScalingGroup.'
                 Type: 'String'
                 Default: '1'
                 
             slaveAutoScalingMax:
-                Description: 'Max number of servers in Hub AutoScalingGroup.'
+                Description: 'Max number of servers in Slave AutoScalingGroup.'
                 Type: 'String'
                 Default: '1'
                 
@@ -62,6 +62,16 @@ template = ->
                                 'm2.xlarge','m2.2xlarge','m2.4xlarge','c1.medium',
                                 'c1.xlarge','cc1.4xlarge','cc2.8xlarge','cg1.4xlarge']
                 ConstraintDescription: 'Must be a valid EC2 instance type.'
+
+            masterAutoScalingMin:
+                Description: 'Min number of servers in Master AutoScalingGroup.'
+                Type: 'String'
+                Default: '1'
+                
+            masterAutoScalingMax:
+                Description: 'Max number of servers in Master AutoScalingGroup.'
+                Type: 'String'
+                Default: '1'
 
             masterInstanceType:
                 Description: "master instance type"
