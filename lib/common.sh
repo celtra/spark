@@ -65,7 +65,7 @@ aws_get_instances() {
 
     FILTERS="Name=tag:aws:cloudformation:stack-name,Values=$CFN_CLUSTER_NAME,"
     FILTERS+='Name=instance-state-name,Values=running'
-    FILTERS+="${ROLE_FILTERS}]"
+    FILTERS+="${ROLE_FILTERS}"
 
     FILTERS=$(tr -d '\n' <<< $FILTERS)
     aws ec2 describe-instances \
