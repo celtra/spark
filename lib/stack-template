@@ -185,7 +185,7 @@ template = ->
                 Properties:
                     ImageId: {Ref: 'ami'}
                     SecurityGroups: ['default', {Ref: 'MasterSecurityGroup'}]
-                    InstanceType: {Ref: "slaveInstanceType"}
+                    InstanceType: {Ref: "masterInstanceType"}
                     KeyName: {Ref: 'sshKey'}
                     UserData: {'Fn::Base64': {'Fn::Join': [ "", [
                         "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
