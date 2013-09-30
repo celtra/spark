@@ -159,7 +159,7 @@ else
     
     echo "  - Allocating space..."
     touch $BASE_IMAGE_PATH.inprogress # here to emit error, since dd is silenced
-    dd if=/dev/zero of=$BASE_IMAGE_PATH.inprogress bs=1M count=2048 >/dev/null 2>&1
+    dd if=/dev/zero of=$BASE_IMAGE_PATH.inprogress bs=1M count=3072 >/dev/null 2>&1
     
     echo "  - Formatting..."
     mkfs.ext3 -q -F $BASE_IMAGE_PATH.inprogress
