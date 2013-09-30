@@ -225,7 +225,7 @@ else
     
     cd $TMPDIR/spark
     git checkout -q $SPARK_VERSION
-    sbt/sbt package > /dev/null
+    sbt/sbt assembly > /dev/null
     rm -fr .git
     cp -rp $TMPDIR/spark $CHROOT/opt/ > /dev/null
     
