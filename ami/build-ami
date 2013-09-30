@@ -38,9 +38,9 @@ BATCH=0
 BASE_IMAGE_CACHE_DIR=
 AMI_ID_FILE=
 S3_BUCKET=celtra-test-ami
-SPARK_VERSION="v0.7.3"
+SPARK_VERSION="v0.8.0-incubating"
 SCALA_VERSION="2.9.3"
-SUMO_VERSION="19.36-6"
+SUMO_VERSION="19.58-5"
 
 while getopts ":hr:a:B:bc:o:" opt; do
     case $opt in
@@ -218,11 +218,10 @@ else
     c rm -fr /opt/SumoCollector
     c dpkg -i /tmp/sumocollector_${SUMO_VERSION}_amd64.deb > /dev/null
     cp "$AMI_ROOT/opt/SumoCollector/config/wrapper.conf" $CHROOT/opt/SumoCollector/config/wrapper.conf
-    c usermod -a -G adm sumo
     c insserv -d collector
 
     echo "  - Installing Spark ${SPARK_VERSION}"
-    git clone -q https://github.com/mesos/spark.git $TMPDIR/spark
+    git clone -q https://github.com/apache/incubator-spark.git $TMPDIR/spark
     
     cd $TMPDIR/spark
     git checkout -q $SPARK_VERSION
