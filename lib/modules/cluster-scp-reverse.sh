@@ -39,18 +39,20 @@ done
 shift `expr $OPTIND - 1`
 
 SOURCE=${1:-}
-DESTINATION=${2:-}
 
-if [ "x$SOURCE" = "x" ] || [ "x$DESTINATION" = "x" ]
+if [ "x$SOURCE" = "x" ] 
 then
     usage
 fi
 
 if INSTANCES=$(aws_get_instances | awk '{print $2}')
 then
+    for instance in $INSTANCES
+    do
+        mkdir $instance
+    done
     # lib/prefix somewhat broken atm
-    parallel -j 99 -i mkdir -p ${DESTINATION}/{} -- $INSTANCES
-    parallel -j 99 -i scp root@{}:${SOURCE} ${DESTINATION}/{}/ --  $INSTANCES
+    parallel -j 99 -i scp -r root@{}:$SOURCE "{}/" --  $INSTANCES
 else
     error "No instances found."
 fi
