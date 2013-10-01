@@ -40,7 +40,7 @@ AMI_ID_FILE=
 S3_BUCKET=celtra-test-ami
 SPARK_VERSION="v0.8.0-incubating"
 SCALA_VERSION="2.9.3"
-SUMO_VERSION="19.36-6"
+SUMO_VERSION="19.58-5"
 
 while getopts ":hr:a:B:bc:o:" opt; do
     case $opt in
@@ -159,7 +159,7 @@ else
     
     echo "  - Allocating space..."
     touch $BASE_IMAGE_PATH.inprogress # here to emit error, since dd is silenced
-    dd if=/dev/zero of=$BASE_IMAGE_PATH.inprogress bs=1M count=2048 >/dev/null 2>&1
+    dd if=/dev/zero of=$BASE_IMAGE_PATH.inprogress bs=1M count=3072 >/dev/null 2>&1
     
     echo "  - Formatting..."
     mkfs.ext3 -q -F $BASE_IMAGE_PATH.inprogress
@@ -218,15 +218,14 @@ else
     c rm -fr /opt/SumoCollector
     c dpkg -i /tmp/sumocollector_${SUMO_VERSION}_amd64.deb > /dev/null
     cp "$AMI_ROOT/opt/SumoCollector/config/wrapper.conf" $CHROOT/opt/SumoCollector/config/wrapper.conf
-    c usermod -a -G adm sumo
     c insserv -d collector
 
     echo "  - Installing Spark ${SPARK_VERSION}"
-    git clone -q https://github.com/mesos/spark.git $TMPDIR/spark
+    git clone -q https://github.com/apache/incubator-spark.git $TMPDIR/spark
     
     cd $TMPDIR/spark
     git checkout -q $SPARK_VERSION
-    sbt/sbt package > /dev/null
+    sbt/sbt assembly > /dev/null
     rm -fr .git
     cp -rp $TMPDIR/spark $CHROOT/opt/ > /dev/null
     
