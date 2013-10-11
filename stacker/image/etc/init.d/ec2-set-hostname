@@ -1,0 +1,20 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          ec2-set-hostname
+# Required-Start:    $local_fs $network
+# Required-Stop:
+# Should-Start:
+# Default-Start:     S
+# Default-Stop:
+# Short-Description: Set hostname based to instance id
+### END INIT INFO
+
+set -e
+
+INSTANCE_ID=$(curl -s 'http://169.254.169.254/1.0/meta-data/instance-id')
+INSTANCE_IP=$(curl -s 'http://instance-data.ec2.internal/latest/meta-data/local-ipv4')
+HOSTNAME="$(echo $INSTANCE_ID)"
+
+#echo $HOSTNAME >/etc/hostname
+#hostname $HOSTNAME
+#echo "${INSTANCE_IP} $HOSTNAME" >>/etc/hosts

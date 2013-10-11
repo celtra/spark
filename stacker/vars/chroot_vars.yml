@@ -1,0 +1,29 @@
+---
+
+scala_version: "2.9.3"
+sumo_version: "19.36-6"
+spark_version: "v0.7.3"
+
+apt_packages:
+    - linux-image-xen-amd64
+    - dhcpcd 
+    - resolvconf
+    - openssh-server
+    - libpcre3
+    - mdadm
+    - parted
+    - sudo
+    - joe
+    - less
+    - zip
+    - unzip
+    - host
+    - iptraf
+    - curl
+    - vim
+    - psmisc
+    - strace
+    - lsof
+    - ntp
+    - sun-java6-jdk
+    - git

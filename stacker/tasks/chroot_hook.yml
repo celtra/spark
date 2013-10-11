@@ -1,0 +1,50 @@
+#- service: name=spark enabled=yes
+- name: Enabling spark
+  command: insserv spark
+
+- name: Accepting java license
+  shell: echo "sun-java6-jre shared/accepted-sun-dlj-v1-1 select true" | /usr/bin/debconf-set-selections
+
+- name: Installing apt packages
+  apt: pkg={{ item }} update_cache=yes
+  with_items: apt_packages
+
+- name: Removing avahi-daemon
+  apt: pkg=avahi-daemon purge=yes
+
+- name: Downloading SumoLogic Collector
+  get_url: url=http://files.celtra.com.s3.amazonaws.com/sumologic/sumocollector_{{ sumo_version }}_amd64.deb
+            dest=/tmp/sumocollector_{{ sumo_version }}_amd64.deb mode=0440
+
+- name: Installing SumoLogic Collector
+  command: dpkg -i /tmp/sumocollector_{{ sumo_version }}_amd64.deb
+
+- name: Copying SumoLogic Collector config
+  copy: dest="/opt/SumoCollector/config/wrapper.conf" src="../image/opt/SumoCollector/config/wrapper.conf"
+
+- name: Adding sumo user to adm group
+  user: name=sumo state=present groups=adm
+
+#- service: name=collector enabled=yes
+- name: Enabling collector
+  command: insserv collector
+
+- file: path=/tmp/spark state=absent
+
+- name: Installing Spark {{ spark_version }}
+  git: repo=https://github.com/mesos/spark.git
+       dest=/tmp/spark
+       version={{ spark_version }}
+
+- command: rm -fr /tmp/spark/.git
+- command: cp -rp /tmp/spark /opt/
+
+- name: Downloading Scala
+  get_url: url=http://www.scala-lang.org/files/archive/scala-{{ scala_version }}.tgz
+            dest=/tmp/scala-{{ scala_version }}.tgz
+
+- name: Untaring Scala
+  shell: cd /opt && tar xzf /tmp/scala-{{ scala_version }}.tgz
+
+- name: Symlinking Scala
+  file: src=/opt/scala-{{ scala_version }} dest=/opt/scala state=link

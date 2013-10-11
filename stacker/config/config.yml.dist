@@ -1,0 +1,24 @@
+---
+
+access_key: ""
+secret_key: ""
+
+
+stack_name: "example"
+clusterName: "example"
+region: "us-east-1"
+
+promptColor: "yellow"
+availabilityZone: "us-east-1a"
+sshKey: "ec2instances"
+notifyEmail: ""  
+masterInstanceType: "m1.small"
+masterAutoScalingMin: "1"
+masterAutoScalingMax: "1"
+slaveInstanceType: "m1.xlarge"
+slaveAutoScalingMin: "1"
+slaveAutoScalingMax: "4"
+sumoUsername: ""
+sumoPassword: ""
+
+ansible_ssh_private_key_file: "/home/user/.ssh/celtra_test_ec2instances.pem"
