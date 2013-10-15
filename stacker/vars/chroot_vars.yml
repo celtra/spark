@@ -1,8 +1,12 @@
 ---
 
 scala_version: "2.9.3"
-sumo_version: "19.36-6"
-spark_version: "v0.7.3"
+sumo_version: "19.58-5"
+
+spark_repo: "https://github.com/apache/incubator-spark.git"
+spark_version: "v0.8.0-incubating"
+
+
 
 apt_packages:
     - linux-image-xen-amd64
