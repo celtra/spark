@@ -31,10 +31,13 @@
 
 - file: path=/tmp/spark state=absent
 
-- name: Installing Spark {{ spark_version }}
+- name: Cloning Spark {{ spark_version }}
   git: repo={{ spark_repo }}
        dest=/tmp/spark
        version={{ spark_version }}
+
+- name: Installing Spark
+  command: /tmp/spark/sbt/sbt assembly
 
 - command: rm -fr /tmp/spark/.git
 - command: cp -rp /tmp/spark /opt/
