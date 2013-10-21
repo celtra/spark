@@ -6,3 +6,4 @@ tmp
 .project
 *.sublime-project
 *.sublime-workspace
+stacker/config/config.yml

@@ -7,6 +7,10 @@ secret_key: ""
 stack_name: "example"
 clusterName: "example"
 region: "us-east-1"
+s3_bucket: "celtra-test-ami"
+
+iam_cert: ""
+iam_private_key: ""
 
 promptColor: "yellow"
 availabilityZone: "us-east-1a"
@@ -21,4 +25,4 @@ slaveAutoScalingMax: "4"
 sumoUsername: ""
 sumoPassword: ""
 
-ansible_ssh_private_key_file: "/home/user/.ssh/celtra_test_ec2instances.pem"
+ssh_private_key: "/home/user/.ssh/celtra_test_ec2instances.pem"
