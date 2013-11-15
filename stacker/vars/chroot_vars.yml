@@ -6,10 +6,9 @@ sumo_version: "19.58-5"
 spark_repo: "https://github.com/apache/incubator-spark.git"
 spark_version: "v0.8.0-incubating"
 
-
+debian_version: "squeeze"
 
 apt_packages:
-    - linux-image-xen-amd64
     - dhcpcd 
     - resolvconf
     - openssh-server
