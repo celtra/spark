@@ -60,7 +60,8 @@ template = ->
                 Default: 'm1.small'
                 AllowedValues: ['m1.small','m1.medium','m1.large','m1.xlarge',
                                 'm2.xlarge','m2.2xlarge','m2.4xlarge','c1.medium',
-                                'c1.xlarge','cc1.4xlarge','cc2.8xlarge','cg1.4xlarge']
+                                'c1.xlarge','c3.xlarge', 'c3.2xlarge', 'cc1.4xlarge',
+                                'c3.4xlarge', 'c3.8xlarge', 'cc2.8xlarge','cg1.4xlarge']
                 ConstraintDescription: 'Must be a valid EC2 instance type.'
 
             masterAutoScalingMin:
@@ -192,7 +193,7 @@ template = ->
                         "SERVER_ROLE='master'\n",
                         "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n"
                         "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
-                        "SUMO_PASSWORD=\"", {Ref: "sumoPassword"}, "\"\n"
+                        "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
                         "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n"
                     ]]}}
 
@@ -208,7 +209,7 @@ template = ->
                         "SERVER_ROLE='slave'\n",
                         "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n",
                         "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
-                        "SUMO_PASSWORD=\"", {Ref: "sumoPassword"}, "\"\n"
+                        "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
                         "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n",
                         "MASTER_IP=\"", { 'Fn::GetAtt' : [ "SlaveWaitCondition", "Data" ]}, "\"\n"
                     ]]}}

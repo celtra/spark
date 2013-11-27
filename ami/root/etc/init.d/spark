@@ -34,6 +34,9 @@ do_config() {
         echo 'export SPARK_JAVA_OPTS="-Dspark.local.dir=/tmp                        -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps ${SPARK_JAVA_OPTS}"' >> /opt/spark/conf/spark-env.sh
     fi
 
+    # Needed or jobs will fail with Too many files open
+    echo "ulimit -n 65536" >> /opt/spark/conf/spark-env.sh
+
     if [ "$SERVER_ROLE" = 'master' ]
     then
         MASTER_IP=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/public-hostname)
