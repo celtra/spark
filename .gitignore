@@ -1,4 +1,3 @@
-config/config.sh
 tmp
 *~
 ._*
@@ -6,4 +5,5 @@ tmp
 .project
 *.sublime-project
 *.sublime-workspace
-stacker/config/config.yml
+stacker/config/*
+!stacker/config/config.yml.dist
