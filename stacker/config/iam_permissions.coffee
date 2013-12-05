@@ -3,25 +3,85 @@
 json = ->
     iam =
         Statement: [{
-        ###
-        # EC2 Permissions
-        ###
+###############################################################################
+#                              EC2 Permissions                                #
+###############################################################################
             Action: [
-                "ec2:DescribeImages",
-                "ec2:RegisterImage",
+                "ec2:AuthorizeSecurityGroupIngress"
                 "ec2:BundleImage",
+                "ec2:CreateSecurityGroup",
+                "ec2:DescribeImages",
                 "ec2:DescribeInstances",
-                "ec2:CreateSecurityGroup"
+                "ec2:DescribeSecurityGroups",
+                "ec2:RegisterImage",
                 ]
             Effect: "Allow",
-            Resource: [
-                "*"
-            ]
+            Resource: "*"
         },
-
-        ###
-        # CloudFormation Permissions
-        ###
+        ## This can delete all security groups but I'm not sure how to limit
+        ## it.
+        {
+            Action: [
+                "ec2:DeleteSecurityGroup",
+                "ec2:RevokeSecurityGroupIngress"
+                ]
+            Effect: "Allow",
+            Resource: "*"
+        },
+###############################################################################
+#                          AutoScaling Permissions                            #
+###############################################################################
+        {
+            Action: [
+                "autoscaling:CreateAutoScalingGroup",
+                "autoscaling:CreateLaunchConfiguration",
+                "autoscaling:DescribeLaunchConfigurations",
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeScalingActivities"
+                ]
+            Effect: "Allow",
+            Resource: "*"
+        },
+        ## This can delete all scaling groups and configs.
+        {
+            Action: [
+                "autoscaling:DeleteAutoScalingGroup",
+                "autoscaling:DeleteLaunchConfiguration",
+                "autoscaling:DeleteLaunchConfiguration",
+                "autoscaling:PutNotificationConfiguration",
+                "autoscaling:UpdateAutoScalingGroup",
+                ]
+            Effect: "Allow",
+            Resource: "*",
+        },
+###############################################################################
+#                          CloudWatch Permissions                             #
+###############################################################################
+        {
+            Action: [
+                "cloudwatch:PutMetricAlarm"
+                ]
+            Effect: "Allow",
+            Resource: "*"
+            Condition: {
+                ArnLike: { 
+                    "aws:SourceArn": "arn:aws:cloudwatch:*:*:sparkie-test-*"
+                }
+            }
+        },
+        ## Cannot specify how to delete just our alarms
+        ## Might change in the future:
+        ## http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/UsingIAM.html
+        {
+            Action: [
+                "cloudwatch:DeleteAlarms"
+                ]
+            Effect: "Allow",
+            Resource: "*"
+        },
+###############################################################################
+#                        CloudFormation Permissions                           #
+###############################################################################
         {
             Effect: "Allow",
             Action: [
@@ -31,37 +91,36 @@ json = ->
                 "cloudformation:DescribeStacks",
                 "cloudformation:DescribeStackEvents"
             ],
-            Resource: [
-                "arn:aws:cloudformation:us-east-1:*:stack/sparkie-test/*"
-            ]
-        },
-
-        ###
-        # SNS Permissions
-        ###
+            Resource: "arn:aws:cloudformation:*:*:stack/sparkie-test/*"
+        },        
+###############################################################################
+#                                SNS Permissions                              #
+###############################################################################
         {
             Effect: "Allow",
             Action: [
                 "SNS:CreateTopic",
                 "SNS:Subscribe"
-          ],
-            Resource: [
-                "arn:aws:sns:us-east-1:*:sparkie-test-NotificationTopic*"
-          ]
+            ],
+            Resource: "arn:aws:sns:*:*:sparkie-test-NotificationTopic-*"
         },
         {
             Effect: "Allow",
             Action: [
                 "SNS:ListTopics"
             ],
-            Resource: [
-                "arn:aws:sns:us-east-1:*:*"
-            ]
+            Resource: "arn:aws:sns:*:*:*"
         },
-
-        ###
-        # S3 Permissions
-        ###
+        {
+            Effect: "Allow",
+            Action: [
+                "SNS:DeleteTopic"
+            ],
+            Resource: "arn:aws:sns:*:*:sparkie-test-NotificationTopic-*"
+        },
+###############################################################################
+#                                 S3 Permissions                              #
+###############################################################################
         {
             Effect: "Allow",
             Action: [
