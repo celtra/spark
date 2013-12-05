@@ -7,3 +7,4 @@ tmp
 *.sublime-workspace
 stacker/config/*
 !stacker/config/config.yml.dist
+!stacker/config/iam_permissions.coffee
