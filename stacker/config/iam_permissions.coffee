@@ -19,8 +19,6 @@ json = ->
             Effect: "Allow",
             Resource: "*"
         },
-        ## This can delete all security groups but I'm not sure how to limit
-        ## it.
         {
             Action: [
                 "ec2:TerminateInstance",
@@ -28,6 +26,7 @@ json = ->
                 ],
             Effect: "Allow",
             Resource: "*",
+            ## This will fail for autoscaling:DeleteAutoScalingGroup
             Condition: {
                 StringEquals: {
                     "ec2:ResourceTag/stack-name": "sparkie-test"
@@ -45,6 +44,7 @@ json = ->
 #                          AutoScaling Permissions                            #
 ###############################################################################
         {
+            ## This can delete all scaling groups and configs.
             Action: [
                 "autoscaling:CreateAutoScalingGroup",
                 "autoscaling:CreateLaunchConfiguration",
@@ -52,32 +52,14 @@ json = ->
                 "autoscaling:DescribeLaunchConfigurations",
                 "autoscaling:DescribeAutoScalingGroups",
                 "autoscaling:DescribeScalingActivities"
-                ],
-            Effect: "Allow",
-            Resource: "*"
-        },
-        ## This can delete all scaling groups and configs.
-        {
-            Action: [
                 "autoscaling:DeleteAutoScalingGroup",
+                "autoscaling:DeleteLaunchConfiguration",
                 "autoscaling:PutNotificationConfiguration",
                 "autoscaling:UpdateAutoScalingGroup"
                 ],
             Effect: "Allow",
-            Resource: "*",
-            Condition: {
-                StringEquals: {
-                    "ec2:ResourceTag/stack-name": "sparkie-test"
-                }
-            }            
-        },
-        {
-            Action: [
-                "autoscaling:DeleteLaunchConfiguration"
-                ],
-            Effect: "Allow",
             Resource: "*"
-        }
+        },
 ###############################################################################
 #                          CloudWatch Permissions                             #
 ###############################################################################
