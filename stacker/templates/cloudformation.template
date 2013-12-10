@@ -84,36 +84,28 @@ template = ->
                 ConstraintDescription: 'Must be a valid EC2 instance type.'
                 
         Resources:
+            ## ACL cannot be set on WaitConditionHandle
             SlaveWaitHandle:
                 Type: 'AWS::CloudFormation::WaitConditionHandle'
-                Properties:
-                    Tags: [{
-                        Key: 'stack-name'
-                        Value: 'stack-test'
-                    }]
-                    
+                Properties: {}
+                
+            ## ACL cannot be set on WaitCondition
             SlaveWaitCondition:
                 Type: 'AWS::CloudFormation::WaitCondition'
                 DependsOn: 'MasterScalingGroup'
                 Properties:
                     Handle: { Ref: 'SlaveWaitHandle' }
                     Timeout: '4500'
-                    Tags: [{
-                        Key: 'stack-name'
-                        Value: 'stack-test'
-                    }]
 
+            ## ACL Handled by Resource in IAM policy
             NotificationTopic:
                 Type: 'AWS::SNS::Topic'
                 Properties:
                     Subscription: [
                         Endpoint: {Ref: "notifyEmail"}
                         Protocol: 'email']
-                    Tags: [{
-                        Key: 'stack-name'
-                        Value: 'stack-test'
-                    }]
             
+            ## ACL Handled by Condition StringEqual in IAM Policy
             MasterSecurityGroup:
                 Type: 'AWS::EC2::SecurityGroup'
                 Properties:
@@ -129,19 +121,6 @@ template = ->
                         ToPort: 22
                         CidrIp: '0.0.0.0/0'
                     }]
-                    Tags: [{
-                        Key: 'stack-name'
-                        Value: 'stack-test'
-                    }]
-            
-            MasterSecurityGroupIngress:
-                Type: 'AWS::EC2::SecurityGroupIngress'
-                Properties:
-                    GroupName: { Ref: 'MasterSecurityGroup' }
-                    SourceSecurityGroupName: { Ref: 'SlaveSecurityGroup' }
-                    IpProtocol: 'tcp'
-                    FromPort: '7077'
-                    ToPort: '7077'
                     Tags: [{
                         Key: 'stack-name'
                         Value: 'stack-test'
@@ -166,6 +145,17 @@ template = ->
                         Key: 'stack-name'
                         Value: 'stack-test'
                     }]
+            
+            ## Cannot tag, cannot set Resource field so we have permission to delete all of them
+            MasterSecurityGroupIngress:
+                Type: 'AWS::EC2::SecurityGroupIngress'
+                Properties:
+                    GroupName: { Ref: 'MasterSecurityGroup' }
+                    SourceSecurityGroupName: { Ref: 'SlaveSecurityGroup' }
+                    IpProtocol: 'tcp'
+                    FromPort: '7077'
+                    ToPort: '7077'
+
                     
             SlaveSecurityGroupIngress1:
                 Type: 'AWS::EC2::SecurityGroupIngress'
@@ -175,10 +165,6 @@ template = ->
                     IpProtocol: 'tcp'
                     FromPort: 7077
                     ToPort: 7077
-                    Tags: [{
-                        Key: 'stack-name'
-                        Value: 'stack-test'
-                    }]
                     
             SlaveSecurityGroupIngress2:
                 Type: 'AWS::EC2::SecurityGroupIngress'
@@ -188,11 +174,8 @@ template = ->
                     IpProtocol: 'tcp'
                     FromPort: 0
                     ToPort: 65535
-                    Tags: [{
-                        Key: 'stack-name'
-                        Value: 'stack-test'
-                    }]
 
+            ## ACL Handled by Condition StringEqual in IAM Policy
             MasterScalingGroup:
                 Type: 'AWS::AutoScaling::AutoScalingGroup'
                 UpdatePolicy:
@@ -215,49 +198,9 @@ template = ->
                     Tags: [{
                         Key: 'stack-name'
                         Value: 'stack-test'
+                        PropagateAtLaunch: true
                     }]
 
-            MasterLaunchConfig:
-                Type: 'AWS::AutoScaling::LaunchConfiguration'
-                Properties:
-                    ImageId: {Ref: 'ami'}
-                    SecurityGroups: ['default', {Ref: 'MasterSecurityGroup'}]
-                    InstanceType: {Ref: "masterInstanceType"}
-                    KeyName: {Ref: 'sshKey'}
-                    UserData: {'Fn::Base64': {'Fn::Join': [ "", [
-                        "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
-                        "SERVER_ROLE='master'\n",
-                        "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n"
-                        "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
-                        "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
-                        "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n"
-                    ]]}}
-                    Tags: [{
-                        Key: 'stack-name'
-                        Value: 'stack-test'
-                    }]
-
-            SlaveLaunchConfig:
-                Type: 'AWS::AutoScaling::LaunchConfiguration'
-                Properties:
-                    ImageId: {Ref: 'ami'}
-                    SecurityGroups: ['default', {Ref: 'SlaveSecurityGroup'}]
-                    InstanceType: {Ref: "slaveInstanceType"}
-                    KeyName: {Ref: 'sshKey'}
-                    UserData: {'Fn::Base64': {'Fn::Join': [ "", [
-                        "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
-                        "SERVER_ROLE='slave'\n",
-                        "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n",
-                        "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
-                        "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
-                        "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n",
-                        "MASTER_IP=\"", { 'Fn::GetAtt' : [ "SlaveWaitCondition", "Data" ]}, "\"\n"
-                    ]]}}
-                    Tags: [{
-                        Key: 'stack-name'
-                        Value: 'stack-test'
-                    }]
-            
             SlaveScalingGroup:
                 Type: 'AWS::AutoScaling::AutoScalingGroup'
                 UpdatePolicy:
@@ -280,8 +223,43 @@ template = ->
                     Tags: [{
                         Key: 'stack-name'
                         Value: 'stack-test'
+                        PropagateAtLaunch: true
                     }]
-            
+
+            ## Cannot tag, cannot set Resource field so we have permission to delete all of them
+            MasterLaunchConfig:
+                Type: 'AWS::AutoScaling::LaunchConfiguration'
+                Properties:
+                    ImageId: {Ref: 'ami'}
+                    SecurityGroups: ['default', {Ref: 'MasterSecurityGroup'}]
+                    InstanceType: {Ref: "masterInstanceType"}
+                    KeyName: {Ref: 'sshKey'}
+                    UserData: {'Fn::Base64': {'Fn::Join': [ "", [
+                        "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
+                        "SERVER_ROLE='master'\n",
+                        "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n"
+                        "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
+                        "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
+                        "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n"
+                    ]]}}
+
+            SlaveLaunchConfig:
+                Type: 'AWS::AutoScaling::LaunchConfiguration'
+                Properties:
+                    ImageId: {Ref: 'ami'}
+                    SecurityGroups: ['default', {Ref: 'SlaveSecurityGroup'}]
+                    InstanceType: {Ref: "slaveInstanceType"}
+                    KeyName: {Ref: 'sshKey'}
+                    UserData: {'Fn::Base64': {'Fn::Join': [ "", [
+                        "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
+                        "SERVER_ROLE='slave'\n",
+                        "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n",
+                        "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
+                        "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
+                        "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n",
+                        "MASTER_IP=\"", { 'Fn::GetAtt' : [ "SlaveWaitCondition", "Data" ]}, "\"\n"
+                    ]]}}
+                        
             SystemCheck:
                 Type: 'AWS::CloudWatch::Alarm'
                 Properties:
@@ -297,10 +275,6 @@ template = ->
                         Name: 'AutoScalingGroupName',
                         Value: {Ref: "SlaveScalingGroup"}]
                     ComparisonOperator: 'GreaterThanOrEqualToThreshold'
-                    Tags: [{
-                        Key: 'stack-name'
-                        Value: 'stack-test'
-                    }]
                     
             InstanceCheck:
                 Type: 'AWS::CloudWatch::Alarm'
@@ -317,10 +291,6 @@ template = ->
                         Name: 'AutoScalingGroupName',
                         Value: {Ref: "SlaveScalingGroup"}]
                     ComparisonOperator: 'GreaterThanOrEqualToThreshold'
-                    Tags: [{
-                        Key: 'stack-name'
-                        Value: 'stack-test'
-                    }]
                     
     stack
 

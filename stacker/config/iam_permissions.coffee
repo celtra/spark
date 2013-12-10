@@ -14,8 +14,8 @@ json = ->
                 "ec2:DescribeImages",
                 "ec2:DescribeInstances",
                 "ec2:DescribeSecurityGroups",
-                "ec2:RegisterImage",
-                ]
+                "ec2:RegisterImage"
+                ],
             Effect: "Allow",
             Resource: "*"
         },
@@ -24,17 +24,23 @@ json = ->
         {
             Action: [
                 "ec2:TerminateInstance",
-                "ec2:DeleteSecurityGroup",
-                "ec2:RevokeSecurityGroupIngress"
-                ]
+                "ec2:DeleteSecurityGroup"
+                ],
             Effect: "Allow",
             Resource: "*",
             Condition: {
-                StingEquals: {
+                StringEquals: {
                     "ec2:ResourceTag/stack-name": "sparkie-test"
                 }
             }
         },
+        {
+            Action: [
+                "ec2:RevokeSecurityGroupIngress"
+                ],
+            Effect: "Allow",
+            Resource: "*"
+        }
 ###############################################################################
 #                          AutoScaling Permissions                            #
 ###############################################################################
@@ -42,10 +48,11 @@ json = ->
             Action: [
                 "autoscaling:CreateAutoScalingGroup",
                 "autoscaling:CreateLaunchConfiguration",
+                "autoscaling:CreateOrUpdateTags",
                 "autoscaling:DescribeLaunchConfigurations",
                 "autoscaling:DescribeAutoScalingGroups",
                 "autoscaling:DescribeScalingActivities"
-                ]
+                ],
             Effect: "Allow",
             Resource: "*"
         },
@@ -53,31 +60,42 @@ json = ->
         {
             Action: [
                 "autoscaling:DeleteAutoScalingGroup",
-                "autoscaling:DeleteLaunchConfiguration",
-                "autoscaling:DeleteLaunchConfiguration",
                 "autoscaling:PutNotificationConfiguration",
-                "autoscaling:UpdateAutoScalingGroup",
-                ]
+                "autoscaling:UpdateAutoScalingGroup"
+                ],
             Effect: "Allow",
             Resource: "*",
+            Condition: {
+                StringEquals: {
+                    "ec2:ResourceTag/stack-name": "sparkie-test"
+                }
+            }            
         },
+        {
+            Action: [
+                "autoscaling:DeleteLaunchConfiguration"
+                ],
+            Effect: "Allow",
+            Resource: "*"
+        }
 ###############################################################################
 #                          CloudWatch Permissions                             #
 ###############################################################################
         {
             Action: [
                 "cloudwatch:PutMetricAlarm"
-                ]
+                ],
             Effect: "Allow",
             Resource: "*"
         },
         ## Cannot specify how to delete just our alarms
         ## Might change in the future:
         ## http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/UsingIAM.html
+        ## Does not support tagging
         {
             Action: [
                 "cloudwatch:DeleteAlarms"
-                ]
+                ],
             Effect: "Allow",
             Resource: "*"
         },
@@ -92,7 +110,7 @@ json = ->
                 "cloudformation:UpdateStack",
                 "cloudformation:DescribeStacks",
                 "cloudformation:DescribeStackEvents"
-            ],
+                ],
             Resource: "arn:aws:cloudformation:*:*:stack/sparkie-test/*"
         },
 ###############################################################################
@@ -103,21 +121,21 @@ json = ->
             Action: [
                 "SNS:CreateTopic",
                 "SNS:Subscribe"
-            ],
+                ],
             Resource: "arn:aws:sns:*:*:sparkie-test-NotificationTopic-*"
         },
         {
             Effect: "Allow",
             Action: [
                 "SNS:ListTopics"
-            ],
+                ],
             Resource: "arn:aws:sns:*:*:*"
         },
         {
             Effect: "Allow",
             Action: [
                 "SNS:DeleteTopic"
-            ],
+                ],
             Resource: "arn:aws:sns:*:*:sparkie-test-NotificationTopic-*"
         },
 ###############################################################################
@@ -129,16 +147,16 @@ json = ->
                 "s3:PutObject",
                 "s3:GetBucketLocation",
                 "s3:PutObjectAcl"
-            ],
+                ],
             Resource: [
                 "arn:aws:s3:::celtra-test-ami",
                 "arn:aws:s3:::celtra-test-ami/*"
-            ]
+                ]
         },
         {
             Action: [
                 "s3:ListAllMyBuckets"
-            ],
+                ],
             Effect: "Allow",
             Resource: "arn:aws:s3:::*"
         }]
