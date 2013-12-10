@@ -10,6 +10,7 @@ json = ->
                 "ec2:AuthorizeSecurityGroupIngress"
                 "ec2:BundleImage",
                 "ec2:CreateSecurityGroup",
+                "ec2:CreateTags",
                 "ec2:DescribeImages",
                 "ec2:DescribeInstances",
                 "ec2:DescribeSecurityGroups",
@@ -22,11 +23,17 @@ json = ->
         ## it.
         {
             Action: [
+                "ec2:TerminateInstance",
                 "ec2:DeleteSecurityGroup",
                 "ec2:RevokeSecurityGroupIngress"
                 ]
             Effect: "Allow",
-            Resource: "*"
+            Resource: "*",
+            Condition: {
+                StingEquals: {
+                    "ec2:ResourceTag/stack-name": "sparkie-test"
+                }
+            }
         },
 ###############################################################################
 #                          AutoScaling Permissions                            #
@@ -63,11 +70,6 @@ json = ->
                 ]
             Effect: "Allow",
             Resource: "*"
-            Condition: {
-                ArnLike: {
-                    "aws:SourceArn": "arn:aws:cloudwatch:*:*:sparkie-test-*"
-                }
-            }
         },
         ## Cannot specify how to delete just our alarms
         ## Might change in the future:

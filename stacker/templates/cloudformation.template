@@ -86,7 +86,11 @@ template = ->
         Resources:
             SlaveWaitHandle:
                 Type: 'AWS::CloudFormation::WaitConditionHandle'
-                Properties: {}
+                Properties:
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
                     
             SlaveWaitCondition:
                 Type: 'AWS::CloudFormation::WaitCondition'
@@ -94,6 +98,10 @@ template = ->
                 Properties:
                     Handle: { Ref: 'SlaveWaitHandle' }
                     Timeout: '4500'
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
 
             NotificationTopic:
                 Type: 'AWS::SNS::Topic'
@@ -101,6 +109,10 @@ template = ->
                     Subscription: [
                         Endpoint: {Ref: "notifyEmail"}
                         Protocol: 'email']
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
             
             MasterSecurityGroup:
                 Type: 'AWS::EC2::SecurityGroup'
@@ -117,6 +129,10 @@ template = ->
                         ToPort: 22
                         CidrIp: '0.0.0.0/0'
                     }]
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
             
             MasterSecurityGroupIngress:
                 Type: 'AWS::EC2::SecurityGroupIngress'
@@ -126,6 +142,10 @@ template = ->
                     IpProtocol: 'tcp'
                     FromPort: '7077'
                     ToPort: '7077'
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
 
             SlaveSecurityGroup:
                 Type: 'AWS::EC2::SecurityGroup'
@@ -142,6 +162,10 @@ template = ->
                         ToPort: 8081
                         CidrIp: '89.143.12.238/32'
                     }]
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
                     
             SlaveSecurityGroupIngress1:
                 Type: 'AWS::EC2::SecurityGroupIngress'
@@ -151,6 +175,10 @@ template = ->
                     IpProtocol: 'tcp'
                     FromPort: 7077
                     ToPort: 7077
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
                     
             SlaveSecurityGroupIngress2:
                 Type: 'AWS::EC2::SecurityGroupIngress'
@@ -160,6 +188,10 @@ template = ->
                     IpProtocol: 'tcp'
                     FromPort: 0
                     ToPort: 65535
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
 
             MasterScalingGroup:
                 Type: 'AWS::AutoScaling::AutoScalingGroup'
@@ -180,6 +212,10 @@ template = ->
                             'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
                             'autoscaling:EC2_INSTANCE_TERMINATE'
                             'autoscaling:EC2_INSTANCE_TERMINATE_ERROR']
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
 
             MasterLaunchConfig:
                 Type: 'AWS::AutoScaling::LaunchConfiguration'
@@ -196,6 +232,10 @@ template = ->
                         "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
                         "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n"
                     ]]}}
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
 
             SlaveLaunchConfig:
                 Type: 'AWS::AutoScaling::LaunchConfiguration'
@@ -213,6 +253,10 @@ template = ->
                         "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n",
                         "MASTER_IP=\"", { 'Fn::GetAtt' : [ "SlaveWaitCondition", "Data" ]}, "\"\n"
                     ]]}}
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
             
             SlaveScalingGroup:
                 Type: 'AWS::AutoScaling::AutoScalingGroup'
@@ -233,6 +277,10 @@ template = ->
                             'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
                             'autoscaling:EC2_INSTANCE_TERMINATE'
                             'autoscaling:EC2_INSTANCE_TERMINATE_ERROR']
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
             
             SystemCheck:
                 Type: 'AWS::CloudWatch::Alarm'
@@ -249,6 +297,10 @@ template = ->
                         Name: 'AutoScalingGroupName',
                         Value: {Ref: "SlaveScalingGroup"}]
                     ComparisonOperator: 'GreaterThanOrEqualToThreshold'
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
                     
             InstanceCheck:
                 Type: 'AWS::CloudWatch::Alarm'
@@ -265,6 +317,10 @@ template = ->
                         Name: 'AutoScalingGroupName',
                         Value: {Ref: "SlaveScalingGroup"}]
                     ComparisonOperator: 'GreaterThanOrEqualToThreshold'
+                    Tags: [{
+                        Key: 'stack-name'
+                        Value: 'stack-test'
+                    }]
                     
     stack
 
