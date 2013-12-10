@@ -64,7 +64,7 @@ json = ->
             Effect: "Allow",
             Resource: "*"
             Condition: {
-                ArnLike: { 
+                ArnLike: {
                     "aws:SourceArn": "arn:aws:cloudwatch:*:*:sparkie-test-*"
                 }
             }
@@ -92,7 +92,7 @@ json = ->
                 "cloudformation:DescribeStackEvents"
             ],
             Resource: "arn:aws:cloudformation:*:*:stack/sparkie-test/*"
-        },        
+        },
 ###############################################################################
 #                                SNS Permissions                              #
 ###############################################################################
