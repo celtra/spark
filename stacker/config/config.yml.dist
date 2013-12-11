@@ -7,6 +7,7 @@ secret_key: ""
 stack_name: "example"
 clusterName: "example"
 region: "us-east-1"
+availabilityZone: "us-east-1a"
 s3_bucket: "celtra-test-ami"
 
 iam_cert: ""
