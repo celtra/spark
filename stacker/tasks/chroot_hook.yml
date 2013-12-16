@@ -19,16 +19,6 @@
 - name: Installing SumoLogic Collector
   command: dpkg -i /tmp/sumocollector_{{ sumo_version }}_amd64.deb
 
-- name: Copying SumoLogic Collector config
-  copy: dest="/opt/SumoCollector/config/wrapper.conf" src="../image/opt/SumoCollector/config/wrapper.conf"
-
-- name: Adding sumo user to adm group
-  user: name=sumo state=present groups=adm
-
-#- service: name=collector enabled=yes
-- name: Enabling collector
-  command: insserv collector
-
 - file: path=/tmp/spark state=absent
 
 - name: Cloning Spark {{ spark_version }}

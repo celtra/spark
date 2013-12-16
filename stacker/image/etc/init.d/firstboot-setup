@@ -56,17 +56,14 @@ echo "  - Mounting /dev/md0 to /tmp"
 echo "/dev/md0   /tmp  ext4    noatime,nodiratime,noacl,nouser_xattr,data=writeback,barrier=0,nobh 0 0" >> /etc/fstab
 mount /tmp
 
-INSTANCE_ID=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/instance-id)
-# Fix SumoConfig
-for var in $(cat /opt/SumoCollector/config/wrapper.conf |  grep -Po '\$\$([^\$]*)\$\$*' | tr -d '$')
-do
-    key=${var//$/\\$}
-    key=${key//\[/\\[}
-    key=${key//\]/\\]}
-    sed -i /opt/SumoCollector/config/wrapper.conf -e 's|\$\$'${key}'\$\$|'"${!var}"'|g'
-done
-chown sumo:sumo /opt/SumoCollector/config/wrapper.conf
-chmod 644 /opt/SumoCollector/config/wrapper.conf
+# Configure SumoLogic Collector
+cat <<EOF > /etc/sumo.conf
+name=${CLUSTER_NAME}-${SERVER_ROLE}-$(curl --silent --retry 3 --show-error http://169.254.169.254/2012-01-12/meta-data/instance-id)
+email=${SUMO_USERNAME}
+password=${SUMO_PASSWORD}
+sources=/etc/sumo.sources
+ephemeral=true
+EOF
 
 # Prevent script from running again
 insserv --remove firstboot-setup
