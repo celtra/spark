@@ -3,7 +3,7 @@
 scala_version: "2.9.3"
 sumo_version: "19.69-6"
 
-spark_repo: "https://github.com/apache/incubator-spark.git"
+spark_repo: "https://github.com/celtra/incubator-spark.git"
 spark_version: "14a1df65729a3c7e5fd54f79424626a540aef5d4"
 
 debian_version: "squeeze"
