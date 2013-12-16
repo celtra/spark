@@ -30,7 +30,7 @@
   command: chdir=/tmp/spark/ sbt/sbt assembly
 
 - command: rm -fr /tmp/spark/.git
-- command: cp -rp /tmp/spark /opt/
+- command: mv /tmp/spark /opt/
 
 - name: Downloading Scala
   get_url: url=http://www.scala-lang.org/files/archive/scala-{{ scala_version }}.tgz
