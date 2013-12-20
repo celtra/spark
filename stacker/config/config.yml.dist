@@ -12,6 +12,7 @@ s3_bucket: "celtra-test-ami"
 
 iam_cert: ""
 iam_private_key: ""
+iam_account_id: ""
 
 promptColor: "yellow"
 availabilityZone: "us-east-1a"
