@@ -4,29 +4,29 @@ scala_version: "2.9.3"
 sumo_version: "19.69-6"
 
 spark_repo: "https://github.com/celtra/incubator-spark.git"
-spark_version: "14a1df65729a3c7e5fd54f79424626a540aef5d4"
+spark_version: "c88a9916a183e7a57b53537531620bbde6d8869a"
 
-debian_version: "squeeze"
+debian_version: "wheezy"
 
 apt_packages:
+    - curl
     - dhcpcd
-    - resolvconf
-    - openssh-server
-    - libpcre3
-    - mdadm
-    - parted
-    - sudo
-    - joe
-    - less
-    - zip
-    - unzip
+    - git
     - host
     - iptraf
-    - curl
-    - vim
-    - psmisc
-    - strace
+    - joe
+    - less
+    - libpcre3
     - lsof
+    - mdadm
     - ntp
-    - sun-java6-jdk
-    - git
+    - openjdk-7-jdk
+    - openssh-server
+    - parted
+    - psmisc
+    - resolvconf
+    - strace
+    - sudo
+    - vim
+    - unzip
+    - zip

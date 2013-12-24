@@ -2,9 +2,6 @@
 - name: Enabling spark
   command: insserv spark
 
-- name: Accepting java license
-  shell: echo "sun-java6-jre shared/accepted-sun-dlj-v1-1 select true" | /usr/bin/debconf-set-selections
-
 - name: Installing apt packages
   apt: pkg={{ item }} update_cache=yes
   with_items: apt_packages
