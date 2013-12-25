@@ -38,6 +38,7 @@ do
 	mkdir $tmp_dir
 	mkfs.ext4 -q -m 0 -O ^has_journal -O dir_index $device
 	echo "$device   $tmp_dir  ext4    noatime,nodiratime,noacl,nouser_xattr,data=writeback,barrier=0,nobh 0 0" >> /etc/fstab
+	mount $tmp_dir
 done
 
 # Configure SumoLogic Collector
