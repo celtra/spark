@@ -38,7 +38,7 @@ BATCH=0
 BASE_IMAGE_CACHE_DIR=
 AMI_ID_FILE=
 S3_BUCKET=celtra-test-ami
-SPARK_VERSION="14a1df65729a3c7e5fd54f79424626a540aef5d4"
+SPARK_VERSION="v0.8.1-incubating"
 SCALA_VERSION="2.9.3"
 SUMO_VERSION="19.58-5"
 
@@ -221,7 +221,7 @@ else
     c insserv -d collector
 
     echo "  - Installing Spark ${SPARK_VERSION}"
-    git clone -q https://github.com/celtra/incubator-spark.git $TMPDIR/spark
+    git clone -q https://github.com/apache/incubator-spark.git $TMPDIR/spark
     
     cd $TMPDIR/spark
     git checkout -q $SPARK_VERSION
