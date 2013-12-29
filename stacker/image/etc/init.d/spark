@@ -52,7 +52,7 @@ do_config() {
         PUBLIC_DNS=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/public-hostname)
         echo "export SPARK_PUBLIC_DNS=$PUBLIC_DNS" >> /opt/spark/conf/spark-env.sh
         echo "export SPARK_MEM=${MEM_SPARK}m" >> /opt/spark/conf/spark-env.sh
-        echo "export SPARK_WORKER_DIR=/tmp/spark-work" >> /opt/spark/conf/spark-env.sh
+        echo "export SPARK_WORKER_DIR=/tmp/spark-xvdb/spark-work" >> /opt/spark/conf/spark-env.sh
         #SPARK_MASTER_PORT
         #SPARK_MASTER_WEBUI_PORT, to use non-default ports
         #SPARK_WORKER_CORES, to set the number of cores to use on this machine
