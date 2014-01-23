@@ -23,6 +23,7 @@ apt_packages:
     - openjdk-7-jdk
     - openssh-server
     - parted
+    - pigz
     - psmisc
     - resolvconf
     - strace
