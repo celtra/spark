@@ -1,7 +1,7 @@
 ---
 
 scala_version: "2.9.3"
-sumo_version: "19.73-1"
+sumo_version: "19.74-1"
 
 spark_repo: "https://github.com/apache/incubator-spark.git"
 spark_version: "v0.8.1-incubating"
