@@ -18,6 +18,7 @@ apt_packages:
     - less
     - libpcre3
     - lsof
+    - mc
     - mdadm
     - ntp
     - openjdk-7-jdk
