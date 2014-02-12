@@ -24,6 +24,7 @@ masterAutoScalingMax: "1"
 slaveInstanceType: "m1.xlarge"
 slaveAutoScalingMin: "1"
 slaveAutoScalingMax: "4"
+slaveMaxSpotPrice: "0.3"
 sumoUsername: ""
 sumoPassword: ""
 

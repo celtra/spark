@@ -64,6 +64,11 @@ template = ->
                                 'c3.4xlarge', 'c3.8xlarge', 'cc2.8xlarge','cg1.4xlarge']
                 ConstraintDescription: 'Must be a valid EC2 instance type.'
 
+            slaveMaxSpotPrice:
+                Description: "Max spot price to pay per hour"
+                Type: 'String'
+                Default: '0.3'
+
             masterAutoScalingMin:
                 Description: 'Min number of servers in Master AutoScalingGroup.'
                 Type: 'String'
@@ -82,7 +87,8 @@ template = ->
                                 'm2.xlarge','m2.2xlarge','m2.4xlarge','c1.medium',
                                 'c1.xlarge','cc1.4xlarge','cc2.8xlarge','cg1.4xlarge']
                 ConstraintDescription: 'Must be a valid EC2 instance type.'
-                
+
+
         Resources:
             ## ACL cannot be set on WaitConditionHandle
             SlaveWaitHandle:
@@ -250,6 +256,7 @@ template = ->
                     SecurityGroups: ['default', {Ref: 'SlaveSecurityGroup'}]
                     InstanceType: {Ref: "slaveInstanceType"}
                     KeyName: {Ref: 'sshKey'}
+                    SpotPrice: {Ref: 'slaveMaxSpotPrice'}
                     UserData: {'Fn::Base64': {'Fn::Join': [ "", [
                         "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
                         "SERVER_ROLE='slave'\n",
@@ -259,7 +266,7 @@ template = ->
                         "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n",
                         "MASTER_IP=\"", { 'Fn::GetAtt' : [ "SlaveWaitCondition", "Data" ]}, "\"\n"
                     ]]}}
-                        
+
             SystemCheck:
                 Type: 'AWS::CloudWatch::Alarm'
                 Properties:
@@ -275,7 +282,7 @@ template = ->
                         Name: 'AutoScalingGroupName',
                         Value: {Ref: "SlaveScalingGroup"}]
                     ComparisonOperator: 'GreaterThanOrEqualToThreshold'
-                    
+
             InstanceCheck:
                 Type: 'AWS::CloudWatch::Alarm'
                 Properties:
@@ -291,7 +298,7 @@ template = ->
                         Name: 'AutoScalingGroupName',
                         Value: {Ref: "SlaveScalingGroup"}]
                     ComparisonOperator: 'GreaterThanOrEqualToThreshold'
-                    
+
     stack
 
 console.log JSON.stringify template()
