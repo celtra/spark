@@ -1,4 +1,6 @@
 #!/usr/bin/env coffee
+##
+# Policy can be max 2048 bytes.
 
 json = ->
     iam =
@@ -11,9 +13,7 @@ json = ->
                 "ec2:BundleImage",
                 "ec2:CreateSecurityGroup",
                 "ec2:CreateTags",
-                "ec2:DescribeImages",
-                "ec2:DescribeInstances",
-                "ec2:DescribeSecurityGroups",
+                "ec2:Describe*",
                 "ec2:RegisterImage"
                 ],
             Effect: "Allow",
@@ -51,7 +51,8 @@ json = ->
                 "autoscaling:CreateOrUpdateTags",
                 "autoscaling:DescribeLaunchConfigurations",
                 "autoscaling:DescribeAutoScalingGroups",
-                "autoscaling:DescribeScalingActivities"
+                "autoscaling:DescribeScalingActivities",
+                "autoscaling:DescribeScheduledActions",
                 "autoscaling:DeleteAutoScalingGroup",
                 "autoscaling:DeleteLaunchConfiguration",
                 "autoscaling:PutNotificationConfiguration",
