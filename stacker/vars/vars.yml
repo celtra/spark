@@ -1,0 +1,34 @@
+---
+
+scala_version: "2.9.3"
+sumo_version: "19.74-1"
+
+spark_repo: "https://github.com/apache/incubator-spark.git"
+spark_version: "v0.8.1-incubating"
+
+debian_version: "wheezy"
+
+apt_packages:
+    - curl
+    - dhcpcd
+    - git
+    - host
+    - iptraf
+    - joe
+    - less
+    - libpcre3
+    - lsof
+    - mc
+    - mdadm
+    - ntp
+    - openjdk-7-jdk
+    - openssh-server
+    - parted
+    - pigz
+    - psmisc
+    - resolvconf
+    - strace
+    - sudo
+    - vim
+    - unzip
+    - zip

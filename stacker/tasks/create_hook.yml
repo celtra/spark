@@ -1,0 +1,2 @@
+- name: Showing version
+  command: cat /etc/issue

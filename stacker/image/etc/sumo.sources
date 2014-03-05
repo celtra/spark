@@ -1,0 +1,74 @@
+{
+    "api.version": "v1",
+    "sources": [ {
+        "sourceType" : "LocalFile",
+        "name" : "syslog",
+        "pathExpression" : "/var/log/syslog",
+        "category" : "OS_Security",
+        "timeZone" : "UTC"
+    },{
+        "sourceType" : "LocalFile",
+        "name" : "dpkg",
+        "pathExpression" : "/var/log/dpkg.log",
+        "category" : "OS_Security",
+        "timeZone" : "UTC"
+    },{
+        "sourceType" : "LocalFile",
+        "name" : "boot",
+        "pathExpression" : "/var/log/boot",
+        "category" : "OS_Security",
+        "timeZone" : "UTC"
+    },{
+        "sourceType" : "LocalFile",
+        "name" : "apt",
+        "pathExpression" : "/var/log/apt/*",
+        "category" : "OS_Security",
+        "timeZone" : "UTC"
+    },{
+        "sourceType" : "LocalFile",
+        "name" : "dmesg",
+        "pathExpression" : "/var/log/dmesg",
+        "category" : "OS_Health",
+        "timeZone" : "UTC"
+    },{
+        "sourceType" : "LocalFile",
+        "name" : "messages",
+        "pathExpression" : "/var/log/messages.log",
+        "category" : "OS_Health",
+        "timeZone" : "UTC"
+    },{
+        "sourceType" : "LocalFile",
+        "name" : "user",
+        "pathExpression" : "/var/log/user.log",
+        "category" : "OS_Security",
+        "timeZone" : "UTC"
+    },{
+        "sourceType" : "LocalFile",
+        "name" : "kernel",
+        "pathExpression" : "/var/log/kern.log",
+        "category" : "OS_Health",
+        "timeZone" : "UTC"
+    },{
+        "sourceType" : "LocalFile",
+        "name" : "spark_worker",
+        "pathExpression" : "/opt/spark/logs/*Worker*",
+        "category" : "Spark_Health",
+        "timeZone" : "UTC"
+    },{
+        "sourceType" : "LocalFile",
+        "name" : "spark_master",
+        "pathExpression" : "/opt/spark/logs/*Master*",
+        "category" : "Spark_Health",
+        "timeZone" : "UTC"
+    },{
+        "sourceType" : "LocalFile",
+        "name" : "spark_jobs",
+        "pathExpression" : "/tmp/spark-work/*/*/std*",
+        "category" : "Spark_Jobs",
+        "timeZone" : "UTC"
+    }],
+    "name" : "System Logs",
+    "description" : "Operating System Logs",
+    "forInstaller" : "linux",
+    "order" : 0
+}

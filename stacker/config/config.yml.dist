@@ -1,0 +1,31 @@
+---
+
+access_key: ""
+secret_key: ""
+
+
+stack_name: "example"
+clusterName: "example"
+region: "us-east-1"
+availabilityZone: "us-east-1a"
+s3_bucket: "celtra-test-ami"
+
+iam_cert: ""
+iam_private_key: ""
+iam_account_id: ""
+
+promptColor: "yellow"
+availabilityZone: "us-east-1a"
+sshKey: "ec2instances"
+notifyEmail: ""
+masterInstanceType: "m1.small"
+masterAutoScalingMin: "1"
+masterAutoScalingMax: "1"
+slaveInstanceType: "m1.xlarge"
+slaveAutoScalingMin: "1"
+slaveAutoScalingMax: "4"
+slaveMaxSpotPrice: "0.3"
+sumoUsername: ""
+sumoPassword: ""
+
+ssh_private_key: "/home/user/.ssh/celtra_test_ec2instances.pem"
