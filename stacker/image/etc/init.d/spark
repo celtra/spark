@@ -16,7 +16,7 @@ do_config() {
     source /etc/user-data
 
     MEM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
-    #leave 75% of the available memory for the OS for cache buffers. If OS has too little memory large spark shuffle writes degrade in performace and eventually fail. 
+    #leave 25% of the available memory for the OS for cache buffers. If OS has too little memory large spark shuffle writes degrade in performace and eventually fail. 
     MEM=$[(MEM_KB * 75 / 100) / 1024]
     MEMG=$[MEM / 1024]
 
