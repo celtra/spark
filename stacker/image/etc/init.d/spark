@@ -16,13 +16,13 @@ do_config() {
     source /etc/user-data
 
     MEM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
-    MEM=$[(MEM_KB - 1024 * 1024) / 1024]
+    #leave 75% of the available memory for the OS for cache buffers. If OS has too little memory large spark shuffle writes degrade in performace and eventually fail. 
+    MEM=$[(MEM_KB * 75 / 100) / 1024]
     MEMG=$[MEM / 1024]
-    MEM_SPARK=$[(MEM-1024)]
 
-    if [ $MEM_SPARK -lt 1024 ]
+    if [ $MEM -lt 1024 ]
     then
-        MEM_SPARK=1024
+        MEM=1024
     fi
 
     echo "export SCALA_HOME='/opt/scala'" > /opt/spark/conf/spark-env.sh
@@ -48,13 +48,16 @@ do_config() {
     then
         MASTER_IP=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/public-hostname)
         echo "export SPARK_MASTER_IP=$MASTER_IP" >> /opt/spark/conf/spark-env.sh
-        echo "export SPARK_MEM=${MEM_SPARK}m" >> /opt/spark/conf/spark-env.sh
+        echo "export SPARK_MEM=${MEM}m" >> /opt/spark/conf/spark-env.sh
 
         curl --silent -X PUT -H 'Content-Type:' --data-binary "{\"Status\" : \"SUCCESS\",\"Reason\" : \"Configuration Complete\",\"UniqueId\" : \"ID1234\",\"Data\" : \"${MASTER_IP}\"}"  "$SIGNAL_URL"
     else
         PUBLIC_DNS=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/public-hostname)
         echo "export SPARK_PUBLIC_DNS=$PUBLIC_DNS" >> /opt/spark/conf/spark-env.sh
-        echo "export SPARK_MEM=${MEM_SPARK}m" >> /opt/spark/conf/spark-env.sh
+	#maximum memory per job (can run multiple jobs at the same time)
+        echo "export SPARK_MEM=${MEM}m" >> /opt/spark/conf/spark-env.sh
+	#maximum memory per spark worker 
+	echo "export SPARK_WORKER_MEMORY=${MEM}m" >> /opt/spark/conf/spark-env.sh
         echo "export SPARK_WORKER_DIR=/tmp/spark-xvdb/spark-work" >> /opt/spark/conf/spark-env.sh
         #SPARK_MASTER_PORT
         #SPARK_MASTER_WEBUI_PORT, to use non-default ports
