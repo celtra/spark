@@ -33,16 +33,19 @@ do_config() {
 
     if [ $MEMG -le 32 ]
     then
-        echo "export SPARK_JAVA_OPTS='-Dspark.local.dir=${tmp_dirs} -Dspark.akka.frameSize=500 -Dspark.akka.askTimeout=60 -Dspark.worker.timeout=600 -Dspark.akka.timeout=200 -Dspark.shuffle.consolidateFiles=true -XX:+UseCompressedOops -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps'" >> /opt/spark/conf/spark-env.sh
+        echo "export SPARK_JAVA_OPTS='-Dspark.local.dir=${tmp_dirs} -Dspark.akka.frameSize=500 -Dspark.akka.askTimeout=60 -Dspark.worker.timeout=600 -Dspark.akka.timeout=200 -Dspark.shuffle.consolidateFiles=true -Dspark.rdd.compress=true -Dspark.akka.threads=8 -Dspark.task.maxFailures=12 -XX:+UseCompressedOops -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/dump'" >> /opt/spark/conf/spark-env.sh
     else
-        echo "export SPARK_JAVA_OPTS='-Dspark.local.dir=${tmp_dirs} -Dspark.akka.frameSize=500 -Dspark.akka.askTimeout=60 -Dspark.worker.timeout=600 -Dspark.akka.timeout=200 -Dspark.shuffle.consolidateFiles=true                        -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps'" >> /opt/spark/conf/spark-env.sh
+        echo "export SPARK_JAVA_OPTS='-Dspark.local.dir=${tmp_dirs} -Dspark.akka.frameSize=500 -Dspark.akka.askTimeout=60 -Dspark.worker.timeout=600 -Dspark.akka.timeout=200 -Dspark.shuffle.consolidateFiles=true -Dspark.rdd.compress=true -Dspark.akka.threads=8 -Dspark.task.maxFailures=12                        -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/dump'" >> /opt/spark/conf/spark-env.sh
     fi
     
     # Needed or jobs will fail with Too many files open
-    echo "ulimit -n 65536" >> /opt/spark/conf/spark-env.sh
+    echo "ulimit -n 524288" >> /opt/spark/conf/spark-env.sh
+
+    # Needed for large shuffle reads so it does not cause OutOfMemoryException on MapInputTracker 
+    echo "sysctl -w vm.max_map_count=524240" >> /opt/spark/conf/spark-env.sh
     
     # Master and slave daemons pick up SPARK_DAEMON_JAVA_OPTS
-    echo "export SPARK_DAEMON_JAVA_OPTS='-Dspark.worker.timeout=600 -Dspark.akka.frameSize=500 -Dspark.akka.askTimeout=60 -Dspark.akka.timeout=200 -Dspark.shuffle.consolidateFiles=true'" >> /opt/spark/conf/spark-env.sh
+    echo "export SPARK_DAEMON_JAVA_OPTS='-Dspark.worker.timeout=600 -Dspark.akka.frameSize=500 -Dspark.akka.askTimeout=60 -Dspark.akka.timeout=200 -Dspark.shuffle.consolidateFiles=true -Dspark.rdd.compress=true -Dspark.akka.threads=8 -Dspark.task.maxFailures=12 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/dump'" >> /opt/spark/conf/spark-env.sh
     
     if [ "$SERVER_ROLE" = 'master' ]
     then
