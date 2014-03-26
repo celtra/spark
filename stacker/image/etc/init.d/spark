@@ -79,10 +79,10 @@ do_start() {
 
     if [ "$SERVER_ROLE" = 'master' ]
     then
-        /opt/spark/bin/start-master.sh
+        /opt/spark/sbin/start-master.sh
     else
         MASTER_IP=$(echo $MASTER_IP | sed -ne "s/.*:\(.*\)\}/\1/p")
-        /opt/spark/bin/start-slave.sh 1 spark://$MASTER_IP:7077
+        /opt/spark/sbin/start-slave.sh 1 spark://$MASTER_IP:7077
     fi
 }
 
