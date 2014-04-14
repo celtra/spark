@@ -56,7 +56,9 @@ json = ->
                 "autoscaling:DeleteAutoScalingGroup",
                 "autoscaling:DeleteLaunchConfiguration",
                 "autoscaling:PutNotificationConfiguration",
-                "autoscaling:UpdateAutoScalingGroup"
+                "autoscaling:SetDesiredCapacity",
+                "autoscaling:UpdateAutoScalingGroup",
+                "autoscaling:TerminateInstanceInAutoScalingGroup"
                 ],
             Effect: "Allow",
             Resource: "*"
