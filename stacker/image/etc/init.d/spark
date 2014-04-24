@@ -16,13 +16,13 @@ do_config() {
     source /etc/user-data
 
     MEM_KB=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
-    MEM=$[(MEM_KB - 1024 * 1024) / 1024]
+    #leave 25% of the available memory for the OS for cache buffers. If OS has too little memory large spark shuffle writes degrade in performace and eventually fail. sournce: http://spark.incubator.apache.org/docs/latest/hardware-provisioning.html
+    MEM=$[(MEM_KB * 75 / 100) / 1024]
     MEMG=$[MEM / 1024]
-    MEM_SPARK=$[(MEM-1024)]
 
-    if [ $MEM_SPARK -lt 1024 ]
+    if [ $MEM -lt 1024 ]
     then
-        MEM_SPARK=1024
+        MEM=1024
     fi
 
     echo "export SCALA_HOME='/opt/scala'" > /opt/spark/conf/spark-env.sh
@@ -33,25 +33,34 @@ do_config() {
 
     if [ $MEMG -le 32 ]
     then
-        echo "export SPARK_JAVA_OPTS='-Dspark.local.dir=${tmp_dirs}, -XX:+UseCompressedOops -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps'" >> /opt/spark/conf/spark-env.sh
+        echo "export SPARK_JAVA_OPTS='-Dspark.local.dir=${tmp_dirs} -Dspark.akka.frameSize=500 -Dspark.akka.askTimeout=60 -Dspark.worker.timeout=600 -Dspark.akka.timeout=200 -Dspark.shuffle.consolidateFiles=true -Dspark.rdd.compress=true -XX:+UseCompressedOops -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/dump'" >> /opt/spark/conf/spark-env.sh
     else
-        echo "export SPARK_JAVA_OPTS='-Dspark.local.dir=${tmp_dirs},                        -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps'" >> /opt/spark/conf/spark-env.sh
+        echo "export SPARK_JAVA_OPTS='-Dspark.local.dir=${tmp_dirs} -Dspark.akka.frameSize=500 -Dspark.akka.askTimeout=60 -Dspark.worker.timeout=600 -Dspark.akka.timeout=200 -Dspark.shuffle.consolidateFiles=true -Dspark.rdd.compress=true                        -XX:+UseParallelGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/dump'" >> /opt/spark/conf/spark-env.sh
     fi
     
     # Needed or jobs will fail with Too many files open
-    echo "ulimit -n 65536" >> /opt/spark/conf/spark-env.sh
+    echo "ulimit -n 524288" >> /opt/spark/conf/spark-env.sh
+
+    # Needed for large shuffle reads so it does not cause OutOfMemoryException on MapInputTracker 
+    echo "sysctl -w vm.max_map_count=524240" >> /opt/spark/conf/spark-env.sh
+    
+    # Master and slave daemons pick up SPARK_DAEMON_JAVA_OPTS
+    echo "export SPARK_DAEMON_JAVA_OPTS='-Dspark.worker.timeout=600 -Dspark.akka.frameSize=500 -Dspark.akka.askTimeout=60 -Dspark.akka.timeout=200 -Dspark.shuffle.consolidateFiles=true -Dspark.rdd.compress=true -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/dump'" >> /opt/spark/conf/spark-env.sh
     
     if [ "$SERVER_ROLE" = 'master' ]
     then
         MASTER_IP=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/public-hostname)
         echo "export SPARK_MASTER_IP=$MASTER_IP" >> /opt/spark/conf/spark-env.sh
-        echo "export SPARK_MEM=${MEM_SPARK}m" >> /opt/spark/conf/spark-env.sh
+        echo "export SPARK_MEM=${MEM}m" >> /opt/spark/conf/spark-env.sh
 
         curl --silent -X PUT -H 'Content-Type:' --data-binary "{\"Status\" : \"SUCCESS\",\"Reason\" : \"Configuration Complete\",\"UniqueId\" : \"ID1234\",\"Data\" : \"${MASTER_IP}\"}"  "$SIGNAL_URL"
     else
         PUBLIC_DNS=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/public-hostname)
         echo "export SPARK_PUBLIC_DNS=$PUBLIC_DNS" >> /opt/spark/conf/spark-env.sh
-        echo "export SPARK_MEM=${MEM_SPARK}m" >> /opt/spark/conf/spark-env.sh
+	#maximum memory per job (can run multiple jobs at the same time)
+        echo "export SPARK_MEM=${MEM}m" >> /opt/spark/conf/spark-env.sh
+	#maximum memory per spark worker 
+	echo "export SPARK_WORKER_MEMORY=${MEM}m" >> /opt/spark/conf/spark-env.sh
         echo "export SPARK_WORKER_DIR=/tmp/spark-xvdb/spark-work" >> /opt/spark/conf/spark-env.sh
         #SPARK_MASTER_PORT
         #SPARK_MASTER_WEBUI_PORT, to use non-default ports
