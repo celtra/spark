@@ -6,8 +6,6 @@ sumo_version: "19.74-1"
 spark_repo: "https://github.com/apache/spark.git"
 spark_version: "v0.9.0-incubating"
 
-debian_version: "wheezy"
-
 apt_packages:
     - curl
     - dhcpcd

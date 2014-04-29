@@ -1,0 +1,6 @@
+---
+- hosts: all
+  user: root
+
+  tasks:
+    - debug: msg="No deploy tasks specified"
