@@ -2,6 +2,8 @@
 ##
 # Policy can be max 2048 bytes.
 
+stack_name = process.argv[2]
+
 json = ->
     iam =
         Statement: [{
@@ -29,7 +31,7 @@ json = ->
             ## This will fail for autoscaling:DeleteAutoScalingGroup
             Condition: {
                 StringEquals: {
-                    "ec2:ResourceTag/stack-name": "sparkie-test"
+                    "ec2:ResourceTag/stack-name": "#{stack_name}"
                 }
             }
         },
@@ -49,10 +51,7 @@ json = ->
                 "autoscaling:CreateAutoScalingGroup",
                 "autoscaling:CreateLaunchConfiguration",
                 "autoscaling:CreateOrUpdateTags",
-                "autoscaling:DescribeLaunchConfigurations",
-                "autoscaling:DescribeAutoScalingGroups",
-                "autoscaling:DescribeScalingActivities",
-                "autoscaling:DescribeScheduledActions",
+                "autoscaling:Describe*",
                 "autoscaling:DeleteAutoScalingGroup",
                 "autoscaling:DeleteLaunchConfiguration",
                 "autoscaling:PutNotificationConfiguration",
@@ -103,7 +102,7 @@ json = ->
                 "cloudformation:DescribeStacks",
                 "cloudformation:DescribeStackEvents"
                 ],
-            Resource: "arn:aws:cloudformation:*:*:stack/sparkie-test/*"
+            Resource: "arn:aws:cloudformation:*:*:stack/#{stack_name}/*"
         },
 ###############################################################################
 #                                SNS Permissions                              #
@@ -114,7 +113,7 @@ json = ->
                 "SNS:CreateTopic",
                 "SNS:Subscribe"
                 ],
-            Resource: "arn:aws:sns:*:*:sparkie-test-NotificationTopic-*"
+            Resource: "arn:aws:sns:*:*:#{stack_name}-NotificationTopic-*"
         },
         {
             Effect: "Allow",
@@ -128,7 +127,7 @@ json = ->
             Action: [
                 "SNS:DeleteTopic"
                 ],
-            Resource: "arn:aws:sns:*:*:sparkie-test-NotificationTopic-*"
+            Resource: "arn:aws:sns:*:*:#{stack_name}-NotificationTopic-*"
         },
 ###############################################################################
 #                                 S3 Permissions                              #
