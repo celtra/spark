@@ -65,20 +65,14 @@ json = ->
 ###############################################################################
 #                          CloudWatch Permissions                             #
 ###############################################################################
-        {
-            Action: [
-                "cloudwatch:PutMetricAlarm"
-                ],
-            Effect: "Allow",
-            Resource: "*"
-        },
         ## Cannot specify how to delete just our alarms
         ## Might change in the future:
         ## http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/UsingIAM.html
         ## Does not support tagging
         {
             Action: [
-                "cloudwatch:DeleteAlarms"
+                "cloudwatch:DeleteAlarms",
+                "cloudwatch:PutMetricAlarm"
                 ],
             Effect: "Allow",
             Resource: "*"
@@ -87,14 +81,13 @@ json = ->
 #                        CloudFormation Permissions                           #
 ###############################################################################
         {
-            Effect: "Allow",
             Action: [
                 "cloudformation:ListStacks"
                 ],
+            Effect: "Allow",
             Resource: "arn:aws:cloudformation:*:*:stack/*"
         },
         {
-            Effect: "Allow",
             Action: [
                 "cloudformation:CreateStack",
                 "cloudformation:DeleteStack",
@@ -103,42 +96,37 @@ json = ->
                 "cloudformation:DescribeStackEvents"
                 ],
             Resource: "arn:aws:cloudformation:*:*:stack/#{stack_name}/*"
+            Effect: "Allow",
         },
 ###############################################################################
 #                                SNS Permissions                              #
 ###############################################################################
         {
-            Effect: "Allow",
             Action: [
                 "SNS:CreateTopic",
+                "SNS:DeleteTopic",
                 "SNS:Subscribe"
                 ],
+            Effect: "Allow",
             Resource: "arn:aws:sns:*:*:#{stack_name}-NotificationTopic-*"
         },
         {
-            Effect: "Allow",
             Action: [
                 "SNS:ListTopics"
                 ],
-            Resource: "arn:aws:sns:*:*:*"
-        },
-        {
             Effect: "Allow",
-            Action: [
-                "SNS:DeleteTopic"
-                ],
-            Resource: "arn:aws:sns:*:*:#{stack_name}-NotificationTopic-*"
+            Resource: "arn:aws:sns:*:*:*"
         },
 ###############################################################################
 #                                 S3 Permissions                              #
 ###############################################################################
         {
-            Effect: "Allow",
             Action: [
                 "s3:PutObject",
                 "s3:GetBucketLocation",
                 "s3:PutObjectAcl"
                 ],
+            Effect: "Allow",
             Resource: [
                 "arn:aws:s3:::celtra-test-ami",
                 "arn:aws:s3:::celtra-test-ami/*"
