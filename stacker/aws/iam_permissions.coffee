@@ -85,7 +85,7 @@ json = ->
                 "cloudformation:ListStacks"
                 ],
             Effect: "Allow",
-            Resource: "arn:aws:cloudformation:*:*:stack/*"
+            Resource: "*"
         },
         {
             Action: [
