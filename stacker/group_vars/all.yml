@@ -14,7 +14,9 @@ apt_packages:
     - iptraf
     - joe
     - less
+    - libpcap0.8
     - libpcre3
+    - libprotobuf-c0
     - lsof
     - mc
     - mdadm
