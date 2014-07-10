@@ -93,6 +93,16 @@ template = ->
                 Type: 'String'
                 Default: 'analytics'
 
+            metricsEndpoint:
+                Description: "Where's your riemann?"
+                Type: 'String'
+                Default: 'monitor.celtra.com'
+
+            metricsPrefix:
+                Description: "Metrics prefix, as in celtra.prod, celtra.test etc..."
+                Type: 'String'
+                Default: 'celtra.test'
+
         Resources:
             ## ACL cannot be set on WaitConditionHandle
             SlaveWaitHandle:
@@ -273,6 +283,8 @@ template = ->
                         "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
                         "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
                         "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n",
+                        "METRICS_ENDPOINT=\"", { Ref: "metricsEndpoint" }, "\"\n",
+                        "METRICS_PREFIX=\"", { Ref: "metricsPrefix" }, "\"\n",
                         "MASTER_IP=\"", { 'Fn::GetAtt' : [ "SlaveWaitCondition", "Data" ]}, "\"\n"
                     ]]}}
 

@@ -1,0 +1,45 @@
+Hostname ".{{ monitorDomain }}"
+LoadPlugin syslog
+<Plugin syslog>
+    LogLevel info
+</Plugin>
+
+Interval 1
+
+LoadPlugin cpu
+
+LoadPlugin df
+<Plugin df>
+    ReportByDevice false
+    ReportReserved false
+    ReportInodes true
+    ValuesAbsolute true
+    ValuesPercentage true
+</Plugin>
+
+<LoadPlugin disk>
+    Interval 60
+</LoadPlugin>
+#LoadPlugin contextswitch
+#LoadPlugin irq
+#LoadPlugin interface
+#<Plugin interface>
+#	Interface eth0
+#</Plugin>
+LoadPlugin memory
+#LoadPlugin processes
+#LoadPlugin vmem
+LoadPlugin load
+#LoadPlugin ethstat
+
+LoadPlugin write_riemann
+<Plugin write_riemann>
+    <Node "riemann">
+          Host "monitor.celtra.com"
+          Port 5555
+          Protocol UDP
+          StoreRates true
+          AlwaysAppendDS false
+          TTLFactor 2.0
+     </Node>
+</Plugin>
