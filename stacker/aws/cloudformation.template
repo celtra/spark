@@ -265,6 +265,8 @@ template = ->
                         "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n"
                         "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
                         "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
+                        "METRICS_ENDPOINT=\"", { Ref: "metricsEndpoint" }, "\"\n",
+                        "METRICS_PREFIX=\"", { Ref: "metricsPrefix" }, "\"\n",
                         "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n"
                     ]]}}
 

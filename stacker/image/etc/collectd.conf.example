@@ -1,4 +1,4 @@
-Hostname ".{{ monitorDomain }}"
+Hostname "<METRICS_PREFIX>"
 LoadPlugin syslog
 <Plugin syslog>
     LogLevel info
@@ -35,7 +35,7 @@ LoadPlugin load
 LoadPlugin write_riemann
 <Plugin write_riemann>
     <Node "riemann">
-          Host "monitor.celtra.com"
+          Host "<METRICS_ENDPOINT>"
           Port 5555
           Protocol UDP
           StoreRates true
