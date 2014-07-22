@@ -1,0 +1,13 @@
+This directory contains custom scripts which pop up in stacker cli as commands.
+
+There are two options:
+
+1) *.yml 
+
+Stacker will treat those as ansible playbooks and will invoke
+ansible in the same way as with `deploy.yml` playbook.
+
+2) *
+
+Stacker will treat those as a normal executable and will run it
+through shell
