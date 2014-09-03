@@ -25,7 +25,7 @@
       get_url: url='http://files.celtra.com/spark/spark-1.0.1-bin-hadoop2.4-httpclient4.2.tgz' dest='/tmp/spark-1.0.1-bin-hadoop2.4-httpclient4.2.tgz'
 
     - name: Unpacking Spark
-      command: tar -C /opt/spark --strip-components=1 -xzf /tmp/spark-1.0.1-bin-hadoop2.4-httpclient4.2.tgz
+      command: mkdir /opt/spark && tar -C /opt/spark --strip-components=1 -xzf /tmp/spark-1.0.1-bin-hadoop2.4-httpclient4.2.tgz
 
     - name: Configuring Spark Logging
       command: mv /opt/spark/conf/log4j.properties.template /opt/spark/conf/log4j.properties
