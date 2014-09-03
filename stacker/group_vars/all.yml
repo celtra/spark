@@ -21,6 +21,7 @@ apt_packages:
     - mc
     - mdadm
     - ntp
+    - openjdk-7-jre-headless
     - openjdk-7-jdk
     - openssh-server
     - parted
