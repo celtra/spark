@@ -24,23 +24,14 @@
     - name: Installing collectd
       command: dpkg --force-confold -i /tmp/collectd_5.4.1-celtra-7_amd64.deb
 
-    - name: Enabling Services
-      service: name={{ item }} enabled=yes
-      with_items: [ 'spark', 'collector', 'collectd' ]
+    - name: Downloading Spark
+      get_url: url='http://files.celtra.com/spark/spark-1.0.1-bin-hadoop2.4-httpclient4.2.tgz dest='/tmp/spark-1.0.1-bin-hadoop2.4-httpclient4.2.tgz'
 
-    - file: path=/tmp/spark state=absent
+    - name: Unpacking Spark
+      command: tar -C /opt/spark --strip-components=1 -xzf /tmp/spark-1.0.1-bin-hadoop2.4-httpclient4.2.tgz
 
-    - name: Cloning Spark {{ spark_version }}
-      git: repo={{ spark_repo }}
-           dest=/tmp/spark
-           version={{ spark_version }}
-
-    - name: Installing Spark
-      command: chdir=/tmp/spark/ sbt/sbt assembly
-
-    - command: rm -fr /tmp/spark/.git
-    - command: mv /tmp/spark /opt/
-    - command: mv /opt/spark/conf/log4j.properties.template /opt/spark/conf/log4j.properties
+    - name: Configuring Spark Logging
+      command: mv /opt/spark/conf/log4j.properties.template /opt/spark/conf/log4j.properties
 
     - name: Downloading Scala
       get_url: url=http://www.scala-lang.org/files/archive/scala-{{ scala_version }}.tgz
@@ -51,3 +42,7 @@
 
     - name: Symlinking Scala
       file: src=/opt/scala-{{ scala_version }} dest=/opt/scala state=link
+
+    - name: Enabling Services
+      service: name={{ item }} enabled=yes
+      with_items: [ 'spark', 'collector', 'collectd' ]
