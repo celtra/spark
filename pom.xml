@@ -1306,6 +1306,19 @@
         <commons.math3.version>3.1.1</commons.math3.version>
         <avro.mapred.classifier>hadoop2</avro.mapred.classifier>
       </properties>
+      <dependencies>
+        <dependency>
+          <groupId>commons-httpclient</groupId>
+          <artifactId>commons-httpclient</artifactId>
+          <version>3.1</version>
+          <scope>provided</scope>
+        </dependency>
+       <dependency>
+       	<groupId>org.apache.httpcomponents</groupId>
+       	<artifactId>httpclient</artifactId>
+       	<version>4.2.1</version>
+      </dependency>
+     </dependencies>
     </profile>
 
     <profile>
