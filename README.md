@@ -1,3 +1,14 @@
+# Build for Celtra
+
+```
+git clone git@github.com:celtra/spark.git
+git checkout celtra
+
+./make-distribution.sh -Dhadoop.version=2.4.0 -Phadoop-2.4
+```
+
+You need maven and JDK 6. This will make a `dist` directory that you can then package into a tar and upload to files.celtra.com.
+
 # Apache Spark
 
 Spark is a fast and general cluster computing system for Big Data. It provides
