@@ -15,31 +15,40 @@ template = ->
             sshKey:
                 Description: 'Name of an existing EC2 KeyPair for SSH access to the instances'
                 Type: 'String'
-                
+
             ami:
                 Description: 'Common AMI id, which is used for all servers.'
                 Type: 'String'
-                
+
             notifyEmail:
                 Description: 'Who to notify via Email with AutoScaling notifications'
                 Type: 'String'
-                
+
             promptColor:
                 Description: 'Shell prompt color, red for production, green for test'
                 Type: 'String'
-            
+
             clusterName:
                 Description: "AWS CloudFormation Stack name. Should be the same as the one in config."
                 Type: 'String'
-            
-            availabilityZone:
-                Description: "AWS Availability Zones"
+
+            dnsDomain:
+                Description: "Your Route53 managed domain name."
                 Type: 'String'
-            
+                Default: 'celtra-test.com'
+
+            masterAvailabilityZone:
+                Description: "AWS Availability Zones for the master, only one"
+                Type: 'String'
+
+            slaveAvailabilityZones:
+                Description: "AWS Availability Zones for slaves. You can use more than 1 in case of spot instances reaching price threshold."
+                Type: 'String'
+
             sumoUsername:
                 Description: "SumoLogic Collector Registration Username"
                 Type: 'String'
-                
+
             sumoPassword:
                 Description: "SumoLogic Collector Registration Password"
                 Type: 'String'
@@ -48,12 +57,12 @@ template = ->
                 Description: 'Min number of servers in Slave AutoScalingGroup.'
                 Type: 'String'
                 Default: '1'
-                
+
             slaveAutoScalingMax:
                 Description: 'Max number of servers in Slave AutoScalingGroup.'
                 Type: 'String'
                 Default: '1'
-                
+
             slaveInstanceType:
                 Description: "slave instance type"
                 Type: 'String'
@@ -68,16 +77,6 @@ template = ->
                 Description: "Max spot price to pay per hour"
                 Type: 'String'
                 Default: '0.3'
-
-            masterAutoScalingMin:
-                Description: 'Min number of servers in Master AutoScalingGroup.'
-                Type: 'String'
-                Default: '1'
-                
-            masterAutoScalingMax:
-                Description: 'Max number of servers in Master AutoScalingGroup.'
-                Type: 'String'
-                Default: '1'
 
             masterInstanceType:
                 Description: "master instance type"
@@ -104,19 +103,6 @@ template = ->
                 Default: 'celtra.test'
 
         Resources:
-            ## ACL cannot be set on WaitConditionHandle
-            SlaveWaitHandle:
-                Type: 'AWS::CloudFormation::WaitConditionHandle'
-                Properties: {}
-                
-            ## ACL cannot be set on WaitCondition
-            SlaveWaitCondition:
-                Type: 'AWS::CloudFormation::WaitCondition'
-                DependsOn: 'MasterScalingGroup'
-                Properties:
-                    Handle: { Ref: 'SlaveWaitHandle' }
-                    Timeout: '4500'
-
             ## ACL Handled by Resource in IAM policy
             NotificationTopic:
                 Type: 'AWS::SNS::Topic'
@@ -124,8 +110,27 @@ template = ->
                     Subscription: [
                         Endpoint: {Ref: "notifyEmail"}
                         Protocol: 'email']
-            
-            ## ACL Handled by Condition StringEqual in IAM Policy
+
+            Ec2ElasticIp:
+                Type: 'AWS::EC2::EIP'
+                Properties:
+                    InstanceId: { Ref: 'Ec2Instance' }
+
+            masterDNSRecord:
+                Type: "AWS::Route53::RecordSet"
+                Properties:
+                    HostedZoneName: {'Fn::Join': [ "", [ {"Ref" : "HostedZone" }, "." ] ]}
+                    Comment: "Master node DNS",
+                    Name: {'Fn::Join': [ "", [
+                       "master.",
+                       {"Ref" : "clusterName"}, ".",
+                       {"Ref" : "dnsDomain"} ,"."
+                    ] ]
+                    Type: "A"
+                    TTL: "900"
+                    ResourceRecords:
+                        { 'Fn::GetAtt': "Ec2ElasticIp" }
+
             MasterSecurityGroup:
                 Type: 'AWS::EC2::SecurityGroup'
                 Properties:
@@ -170,7 +175,7 @@ template = ->
                         Key: 'stack-name'
                         Value: { Ref: 'clusterName' }
                     }]
-            
+
             ## Cannot tag, cannot set Resource field so we have permission to delete all of them
             MasterSecurityGroupIngress:
                 Type: 'AWS::EC2::SecurityGroupIngress'
@@ -181,7 +186,7 @@ template = ->
                     FromPort: '7077'
                     ToPort: '7077'
 
-                    
+
             SlaveSecurityGroupIngress1:
                 Type: 'AWS::EC2::SecurityGroupIngress'
                 Properties:
@@ -190,7 +195,7 @@ template = ->
                     IpProtocol: 'tcp'
                     FromPort: 7077
                     ToPort: 7077
-                    
+
             SlaveSecurityGroupIngress2:
                 Type: 'AWS::EC2::SecurityGroupIngress'
                 Properties:
@@ -200,31 +205,29 @@ template = ->
                     FromPort: 0
                     ToPort: 65535
 
-            ## ACL Handled by Condition StringEqual in IAM Policy
-            MasterScalingGroup:
-                Type: 'AWS::AutoScaling::AutoScalingGroup'
-                UpdatePolicy:
-                    AutoScalingRollingUpdate:
-                        MinInstancesInService : "0",
-                        MaxBatchSize : "32",
-                        PauseTime : "PT0M"
+            Ec2Instance:
+                Type: 'AWS::EC2::Instance'
                 Properties:
-                    AvailabilityZones:  [ {Ref: 'availabilityZone'} ]
-                    LaunchConfigurationName: {Ref: "MasterLaunchConfig"}
-                    MinSize: {Ref: "masterAutoScalingMin"}
-                    MaxSize: {Ref: "masterAutoScalingMax"}
-                    NotificationConfiguration:
-                        TopicARN: {Ref: "NotificationTopic"}
-                        NotificationTypes: [
-                            'autoscaling:EC2_INSTANCE_LAUNCH'
-                            'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
-                            'autoscaling:EC2_INSTANCE_TERMINATE'
-                            'autoscaling:EC2_INSTANCE_TERMINATE_ERROR']
-                    Tags: [{
+                    ImageId: { Ref: 'ami' }
+                    KeyName: { Ref: 'sshKey' }
+                    AvailabilityZone: { Ref: 'masterAvailabilityZone' }
+                    InstanceType: { Ref: 'masterInstanceType' }
+                    SecurityGroups: [
+                        "default",
+                        { Ref: 'MasterSecurityGroup' }
+                    ]
+                    UserData: {'Fn::Base64': {'Fn::Join': [ "", [
+                        "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
+                        "SERVER_ROLE='master'\n",
+                        "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n"
+                        "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
+                        "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
+                        "METRICS_ENDPOINT=\"", { Ref: "metricsEndpoint" }, "\"\n",
+                        "METRICS_PREFIX=\"", { Ref: "metricsPrefix" }, "\"\n"
+                    ]]}}
+                    Tags: [
                         Key: 'stack-name'
-                        Value: { Ref: 'clusterName' }
-                        PropagateAtLaunch: true
-                    }]
+                        Value: { Ref: 'stackName' } ]
 
             SlaveScalingGroup:
                 Type: 'AWS::AutoScaling::AutoScalingGroup'
@@ -234,7 +237,7 @@ template = ->
                         MaxBatchSize : "32",
                         PauseTime : "PT0M"
                 Properties:
-                    AvailabilityZones:  [ {Ref: 'availabilityZone'} ]
+                    AvailabilityZones:  [ {Ref: 'slaveAvailabilityZones'} ]
                     LaunchConfigurationName: {Ref: "SlaveLaunchConfig"}
                     MinSize: {Ref: "slaveAutoScalingMin"}
                     MaxSize: {Ref: "slaveAutoScalingMax"}
@@ -251,25 +254,6 @@ template = ->
                         PropagateAtLaunch: true
                     }]
 
-            ## Cannot tag, cannot set Resource field so we have permission to delete all of them
-            MasterLaunchConfig:
-                Type: 'AWS::AutoScaling::LaunchConfiguration'
-                Properties:
-                    ImageId: {Ref: 'ami'}
-                    SecurityGroups: ['default', {Ref: 'MasterSecurityGroup'}]
-                    InstanceType: {Ref: "masterInstanceType"}
-                    KeyName: {Ref: 'sshKey'}
-                    UserData: {'Fn::Base64': {'Fn::Join': [ "", [
-                        "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
-                        "SERVER_ROLE='master'\n",
-                        "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n"
-                        "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
-                        "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
-                        "METRICS_ENDPOINT=\"", { Ref: "metricsEndpoint" }, "\"\n",
-                        "METRICS_PREFIX=\"", { Ref: "metricsPrefix" }, "\"\n",
-                        "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n"
-                    ]]}}
-
             SlaveLaunchConfig:
                 Type: 'AWS::AutoScaling::LaunchConfiguration'
                 Properties:
@@ -284,10 +268,8 @@ template = ->
                         "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n",
                         "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
                         "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
-                        "SIGNAL_URL=\"", { Ref: "SlaveWaitHandle" }, "\"\n",
                         "METRICS_ENDPOINT=\"", { Ref: "metricsEndpoint" }, "\"\n",
-                        "METRICS_PREFIX=\"", { Ref: "metricsPrefix" }, "\"\n",
-                        "MASTER_IP=\"", { 'Fn::GetAtt' : [ "SlaveWaitCondition", "Data" ]}, "\"\n"
+                        "METRICS_PREFIX=\"", { Ref: "metricsPrefix" }, "\"\n"
                     ]]}}
 
             SystemCheck:
