@@ -77,7 +77,7 @@ do_start() {
     then
         /opt/spark/sbin/start-master.sh
     else
-        MASTER_IP=$(echo $MASTER_IP | sed -ne "s/.*:\(.*\)\}/\1/p")
+        MASTER_DNS="master.${CLUSTER_NAME}.${DNS_DOMAIN}"
         /opt/spark/sbin/start-slave.sh 1 spark://$MASTER_IP:7077
     fi
 }

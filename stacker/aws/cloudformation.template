@@ -103,7 +103,7 @@ template = ->
                 Default: 'celtra.test'
 
         Resources:
-            ## ACL Handled by Resource in IAM policy
+            # ACL Handled by Resource in IAM policy
             NotificationTopic:
                 Type: 'AWS::SNS::Topic'
                 Properties:
@@ -119,17 +119,16 @@ template = ->
             masterDNSRecord:
                 Type: "AWS::Route53::RecordSet"
                 Properties:
-                    HostedZoneName: {'Fn::Join': [ "", [ {"Ref" : "HostedZone" }, "." ] ]}
-                    Comment: "Master node DNS",
+                    HostedZoneName: {'Fn::Join': [ "", [ {"Ref" : "dnsDomain" }, "." ] ]}
+                    Comment: "Master node DNS"
                     Name: {'Fn::Join': [ "", [
                        "master.",
                        {"Ref" : "clusterName"}, ".",
                        {"Ref" : "dnsDomain"} ,"."
-                    ] ]
+                    ] ]}
                     Type: "A"
                     TTL: "900"
-                    ResourceRecords:
-                        { 'Fn::GetAtt': "Ec2ElasticIp" }
+                    ResourceRecords: [ { Ref: "Ec2ElasticIp" } ]
 
             MasterSecurityGroup:
                 Type: 'AWS::EC2::SecurityGroup'
@@ -227,7 +226,7 @@ template = ->
                     ]]}}
                     Tags: [
                         Key: 'stack-name'
-                        Value: { Ref: 'stackName' } ]
+                        Value: { Ref: 'clusterName' } ]
 
             SlaveScalingGroup:
                 Type: 'AWS::AutoScaling::AutoScalingGroup'
@@ -265,6 +264,7 @@ template = ->
                     UserData: {'Fn::Base64': {'Fn::Join': [ "", [
                         "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
                         "SERVER_ROLE='slave'\n",
+                        "DNS_DOMAIN=\"", {Ref: "dnsDomain"}, "\"\n",
                         "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n",
                         "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
                         "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"
