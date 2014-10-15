@@ -37,6 +37,15 @@ template = ->
                 Type: 'String'
                 Default: 'celtra-test.com'
 
+            stackEnvironment:
+                Description: "Stack Environment, prod or test or staging, for billing purposes."
+                Type: 'String'
+                Default: 'test'
+
+            stackOwner:
+                Description: "Your AWS username, for billing purposes"
+                Type: 'String'
+
             masterAvailabilityZone:
                 Description: "AWS Availability Zones for the master, only one"
                 Type: 'String'
@@ -111,11 +120,6 @@ template = ->
                         Endpoint: {Ref: "notifyEmail"}
                         Protocol: 'email']
 
-            Ec2ElasticIp:
-                Type: 'AWS::EC2::EIP'
-                Properties:
-                    InstanceId: { Ref: 'Ec2Instance' }
-
             masterDNSRecord:
                 Type: "AWS::Route53::RecordSet"
                 Properties:
@@ -126,9 +130,9 @@ template = ->
                        {"Ref" : "clusterName"}, ".",
                        {"Ref" : "dnsDomain"} ,"."
                     ] ]}
-                    Type: "A"
-                    TTL: "900"
-                    ResourceRecords: [ { Ref: "Ec2ElasticIp" } ]
+                    Type: "CNAME"
+                    TTL: "60"
+                    ResourceRecords: [ { 'Fn::GetAtt': [ "Ec2Instance", "PublicDnsName" ] } ]
 
             MasterSecurityGroup:
                 Type: 'AWS::EC2::SecurityGroup'
@@ -153,6 +157,14 @@ template = ->
                     Tags: [{
                         Key: 'stack-name'
                         Value: { Ref: 'clusterName' }
+                    },
+                    {
+                        Key: 'environment'
+                        Value: { Ref: 'stackEnvironment'}
+                    },
+                    {
+                        Key: 'owner'
+                        Value: { Ref: 'stackOwner' }
                     }]
 
             SlaveSecurityGroup:
@@ -173,6 +185,14 @@ template = ->
                     Tags: [{
                         Key: 'stack-name'
                         Value: { Ref: 'clusterName' }
+                    },
+                    {
+                        Key: 'environment'
+                        Value: { Ref: 'stackEnvironment'}
+                    },
+                    {
+                        Key: 'owner'
+                        Value: { Ref: 'stackOwner' }
                     }]
 
             ## Cannot tag, cannot set Resource field so we have permission to delete all of them
@@ -224,9 +244,18 @@ template = ->
                         "METRICS_ENDPOINT=\"", { Ref: "metricsEndpoint" }, "\"\n",
                         "METRICS_PREFIX=\"", { Ref: "metricsPrefix" }, "\"\n"
                     ]]}}
-                    Tags: [
+                    Tags: [{
                         Key: 'stack-name'
-                        Value: { Ref: 'clusterName' } ]
+                        Value: { Ref: 'clusterName' }
+                    },
+                    {
+                        Key: 'environment'
+                        Value: { Ref: 'stackEnvironment'}
+                    },
+                    {
+                        Key: 'owner'
+                        Value: { Ref: 'stackOwner' }
+                    }]
                 DependsOn: "MasterSecurityGroup"
 
             SlaveScalingGroup:
@@ -252,7 +281,18 @@ template = ->
                         Key: 'stack-name'
                         Value: { Ref: 'clusterName' }
                         PropagateAtLaunch: true
+                    },
+                    {
+                        Key: 'environment'
+                        Value: { Ref: 'stackEnvironment'}
+                        PropagateAtLaunch: true
+                    },
+                    {
+                        Key: 'owner'
+                        Value: { Ref: 'stackOwner' }
+                        PropagateAtLaunch: true
                     }]
+                DependsOn: "Ec2Instance"
 
             SlaveLaunchConfig:
                 Type: 'AWS::AutoScaling::LaunchConfiguration'

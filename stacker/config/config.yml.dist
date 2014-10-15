@@ -1,33 +1,84 @@
 ---
 
+##
+# AWS Access and Secret Keys
+#
+# These are the ones used to creating and managing stack. Use your own or stack specific keys.
 access_key: ""
 secret_key: ""
 
 
+##
+# Name your stack.
 stack_name: "example"
 clusterName: "example"
+
+##
+# Region where you want to have your stack.
 region: "us-east-1"
-availabilityZone: "us-east-1a"
+
+##
+# AMI S3 bucket, leave default.
 s3_bucket: "celtra-test-ami"
 
+##
+# Certs for siging and deploying AMI iamges. You need this.
+#
 iam_cert: ""
 iam_private_key: ""
-iam_account_id: ""
+iam_account_id: "458622088931"
 
+##
+# For billing purposes.
+# stackOwner should match the AWS username you're creating the stack with.
+stackEnvironment: "development"
+stackOwner: "sparkie-test"
+
+##
+# Set your prompt color to yellow or green, leave red for production.
 promptColor: "yellow"
+
+###
+# Master node settings
+###
+# Specify only one zone where you want your master.
 masterAvailabilityZone: "us-east-1a"
-slaveAvailabilityZone: "us-east-1a,us-east-1b"
-dnsDomain: "celtra-test.com"
-sshKey: "ec2instances"
-notifyEmail: ""
+# What instance type. You can leave m1.small, master does practically nothing.
 masterInstanceType: "m1.small"
+
+###
+# Slave node settings
+###
+# Specify zones for your slaves, can be more than 1.
+slaveAvailabilityZone: "us-east-1a,us-east-1b"
+# Instance type for slaves. Whatever you need.
 slaveInstanceType: "m1.xlarge"
+# Min instances.
 slaveAutoScalingMin: "1"
+# Max instances.
 slaveAutoScalingMax: "4"
+# Max Spot price. Check the history and find whatever works for you for your instance type.
 slaveMaxSpotPrice: "0.3"
+
+##
+# Your ssh key for EC2 instances.
+sshKey: "ec2instances"
+ssh_private_key: "/home/user/.ssh/celtra_test_ec2instances.pem"
+
+##
+# DNS domain (not hostname, subdomain), leave default.
+dnsDomain: "celtra-test.com"
+
+##
+# Where to send alerts.
+notifyEmail: ""
+
+##
+# Add sumologic credentials if you want logging on SumoLogic.
 sumoUsername: ""
 sumoPassword: ""
+
+##
+# Add metrics if you want monitoring via monitor.celtra.com.
 metricsEndpoint: "monitor.celtra.com"
 metricsPrefix: "test.celtra"
-
-ssh_private_key: "/home/user/.ssh/celtra_test_ec2instances.pem"
