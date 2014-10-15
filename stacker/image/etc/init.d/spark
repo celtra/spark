@@ -76,7 +76,7 @@ do_start() {
         /opt/spark/sbin/start-master.sh
     else
         # Need to resolve hostname to ip, otherwise we get some akka shittiness.
-        MASTER_IP="$(dig +short master.${CLUSTER_NAME}.${DNS_DOMAIN}) A"
+        MASTER_IP="$(dig +short master.${CLUSTER_NAME}.${DNS_DOMAIN} A)"
         /opt/spark/sbin/start-slave.sh 1 spark://$MASTER_IP:7077
     fi
 }
