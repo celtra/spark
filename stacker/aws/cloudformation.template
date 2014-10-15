@@ -227,6 +227,7 @@ template = ->
                     Tags: [
                         Key: 'stack-name'
                         Value: { Ref: 'clusterName' } ]
+                DependsOn: "MasterSecurityGroup"
 
             SlaveScalingGroup:
                 Type: 'AWS::AutoScaling::AutoScalingGroup'
