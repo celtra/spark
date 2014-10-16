@@ -55,7 +55,7 @@ masterInstanceType: "m1.small"
 # Slave node settings
 ###
 # Specify zones for your slaves, can be more than 1.
-slaveAvailabilityZone: "us-east-1a,us-east-1b"
+slaveAvailabilityZones: "us-east-1a,us-east-1b"
 # Instance type for slaves. Whatever you need.
 slaveInstanceType: "m1.xlarge"
 # Min instances.
