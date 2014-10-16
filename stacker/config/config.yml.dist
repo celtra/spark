@@ -38,6 +38,11 @@ stackOwner: "sparkie-test"
 # Set your prompt color to yellow or green, leave red for production.
 promptColor: "yellow"
 
+##
+# DriverSecurityGroup
+# Set this to securityGroup of the server you're using as your driver.
+driverSecurityGroup: "gateway"
+
 ###
 # Master node settings
 ###
