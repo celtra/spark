@@ -52,7 +52,7 @@ template = ->
 
             slaveAvailabilityZones:
                 Description: "AWS Availability Zones for slaves. You can use more than 1 in case of spot instances reaching price threshold."
-                Type: 'String'
+                Type: 'CommaDelimitedList'
 
             sumoUsername:
                 Description: "SumoLogic Collector Registration Username"
@@ -266,7 +266,7 @@ template = ->
                         MaxBatchSize : "32",
                         PauseTime : "PT0M"
                 Properties:
-                    AvailabilityZones:  [ {Ref: 'slaveAvailabilityZones'} ]
+                    AvailabilityZones:  {Ref: 'slaveAvailabilityZones'}
                     LaunchConfigurationName: {Ref: "SlaveLaunchConfig"}
                     MinSize: {Ref: "slaveAutoScalingMin"}
                     MaxSize: {Ref: "slaveAutoScalingMax"}
