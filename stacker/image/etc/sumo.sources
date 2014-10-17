@@ -63,7 +63,7 @@
     },{
         "sourceType" : "LocalFile",
         "name" : "spark_jobs",
-        "pathExpression" : "/tmp/spark-work/*/*/std*",
+        "pathExpression" : "/tmp/spark-xvd*/spark-work/*/*/std*",
         "category" : "Spark_Jobs",
         "timeZone" : "UTC"
     }],
