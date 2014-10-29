@@ -37,6 +37,7 @@ json = ->
         {
             Action: [
                 "ec2:TerminateInstance",
+                "ec2:TerminateInstances",
                 "ec2:DeleteSecurityGroup"
                 ],
             Effect: "Allow",
