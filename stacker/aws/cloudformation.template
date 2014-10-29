@@ -238,6 +238,7 @@ template = ->
                     UserData: {'Fn::Base64': {'Fn::Join': [ "", [
                         "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
                         "SERVER_ROLE='master'\n",
+                        "DNS_DOMAIN=\"", {Ref: "dnsDomain"}, "\"\n",
                         "PROMPT_COLOR=\"", {Ref: "promptColor"}, "\"\n"
                         "SUMO_USERNAME=\"", {Ref: "sumoUsername"}, "\"\n"
                         "SUMO_PASSWORD=\'", {Ref: "sumoPassword"}, "\'\n"

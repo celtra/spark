@@ -45,7 +45,7 @@ do_config() {
 
     if [ "$SERVER_ROLE" = 'master' ]
     then
-        MASTER_IP=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/local-ipv4)
+        MASTER_IP="master.${STACK_NAME}.${DNS_DOMAIN}"
         echo "export SPARK_MASTER_IP=$MASTER_IP" >> /opt/spark/conf/spark-env.sh
         echo "export SPARK_EXECUTOR_MEMORY=${MEM}m" >> /opt/spark/conf/spark-env.sh
     else
@@ -75,7 +75,7 @@ do_start() {
         /opt/spark/sbin/start-master.sh
     else
         # Need to resolve hostname to ip, otherwise we get some akka shittiness.
-        MASTER_IP="$(dig +short master.${CLUSTER_NAME}.${DNS_DOMAIN} A | tail -n1)"
+        MASTER_IP="master.${STACK_NAME}.${DNS_DOMAIN}"
         /opt/spark/sbin/start-slave.sh 1 spark://$MASTER_IP:7077
     fi
 }
