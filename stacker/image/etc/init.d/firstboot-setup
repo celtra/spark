@@ -47,7 +47,6 @@ name=${CLUSTER_NAME}-${SERVER_ROLE}-$(curl --silent --retry 3 --show-error http:
 email=${SUMO_USERNAME}
 password=${SUMO_PASSWORD}
 sources=/etc/sumo.sources
-ephemeral=true
 EOF
 
 # Sed reorders test.celtra.com to com.celtra.test

@@ -9,6 +9,7 @@ spark_version: "v1.0.1"
 apt_packages:
     - curl
     - dhcpcd
+    - dnsutils
     - git
     - host
     - iptraf

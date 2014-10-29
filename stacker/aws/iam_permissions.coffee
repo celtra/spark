@@ -16,11 +16,24 @@ json = ->
                 "ec2:CreateSecurityGroup",
                 "ec2:CreateTags",
                 "ec2:Describe*",
-                "ec2:RegisterImage"
+                "ec2:RegisterImage",
+                "ec2:RunInstances",
+                "ec2:allocateAddress",
+                "ec2:associateAddress",
+                "route53:ListHostedZones",
+                "route53:ChangeResourceRecordSets",
+                "route53:Get*"
                 ],
             Effect: "Allow",
             Resource: "*"
         },
+        #{
+        #    Action: [
+        #        "route53:ChangeResourceRecordSets"
+        #        ],
+        #    Effect: "Allow",
+        #    Resource: ""
+        #},
         {
             Action: [
                 "ec2:TerminateInstance",
@@ -92,8 +105,7 @@ json = ->
                 "cloudformation:CreateStack",
                 "cloudformation:DeleteStack",
                 "cloudformation:UpdateStack",
-                "cloudformation:DescribeStacks",
-                "cloudformation:DescribeStackEvents"
+                "cloudformation:Describe*"
                 ],
             Resource: "arn:aws:cloudformation:*:*:stack/#{stack_name}/*"
             Effect: "Allow",

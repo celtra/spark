@@ -45,23 +45,20 @@ do_config() {
 
     if [ "$SERVER_ROLE" = 'master' ]
     then
-        MASTER_IP=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/public-hostname)
+        MASTER_IP=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/local-ipv4)
         echo "export SPARK_MASTER_IP=$MASTER_IP" >> /opt/spark/conf/spark-env.sh
-        echo "export SPARK_MEM=${MEM}m" >> /opt/spark/conf/spark-env.sh
-
-        curl --silent -X PUT -H 'Content-Type:' --data-binary "{\"Status\" : \"SUCCESS\",\"Reason\" : \"Configuration Complete\",\"UniqueId\" : \"ID1234\",\"Data\" : \"${MASTER_IP}\"}"  "$SIGNAL_URL"
+        echo "export SPARK_EXECUTOR_MEMORY=${MEM}m" >> /opt/spark/conf/spark-env.sh
     else
         PUBLIC_DNS=$(wget -q -O - http://instance-data.ec2.internal/latest/meta-data/public-hostname)
         echo "export SPARK_PUBLIC_DNS=$PUBLIC_DNS" >> /opt/spark/conf/spark-env.sh
         #maximum memory per job (can run multiple jobs at the same time)
-        echo "export SPARK_MEM=${MEM}m" >> /opt/spark/conf/spark-env.sh
+        echo "export SPARK_EXECUTOR_MEMORY=${MEM}m" >> /opt/spark/conf/spark-env.sh
         #maximum memory per spark worker
         echo "export SPARK_WORKER_MEMORY=${MEM}m" >> /opt/spark/conf/spark-env.sh
         echo "export SPARK_WORKER_DIR=/tmp/spark-xvdb/spark-work" >> /opt/spark/conf/spark-env.sh
         #SPARK_MASTER_PORT
         #SPARK_MASTER_WEBUI_PORT, to use non-default ports
         #SPARK_WORKER_CORES, to set the number of cores to use on this machine
-        #SPARK_WORKER_MEMORY, to set how much memory to use (e.g. 1000m, 2g)
         #SPARK_WORKER_PORT
         #SPARK_WORKER_WEBUI_PORT
     fi
@@ -77,7 +74,8 @@ do_start() {
     then
         /opt/spark/sbin/start-master.sh
     else
-        MASTER_IP=$(echo $MASTER_IP | sed -ne "s/.*:\(.*\)\}/\1/p")
+        # Need to resolve hostname to ip, otherwise we get some akka shittiness.
+        MASTER_IP="$(dig +short master.${CLUSTER_NAME}.${DNS_DOMAIN} A | tail -n1)"
         /opt/spark/sbin/start-slave.sh 1 spark://$MASTER_IP:7077
     fi
 }
