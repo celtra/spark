@@ -15,6 +15,10 @@
     - name: Installing SumoLogic Collector
       command: dpkg -i /tmp/sumocollector_19.99-5_amd64.deb
 
+    # For some reason it's missing RunLevel 2 link
+    - name: Start collector at boot
+      file: src=/etc/init.d/collector dest=/etc/rc2.d/S02collector state=link
+
     - name: Downloading collectd
       get_url: url='http://files.celtra.com.s3.amazonaws.com/debian/wheezy/collectd_5.4.1-celtra-7_amd64.deb' dest=/tmp/collectd_5.4.1-celtra-7_amd64.deb
 
