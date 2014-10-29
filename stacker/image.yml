@@ -9,11 +9,11 @@
       with_items: apt_packages
 
     - name: Downloading SumoLogic Collector
-      get_url: url=http://files.celtra.com.s3.amazonaws.com/sumologic/sumocollector_{{ sumo_version }}_amd64.deb
-                dest=/tmp/sumocollector_{{ sumo_version }}_amd64.deb mode=0440
+      get_url: url=http://files.celtra.com.s3.amazonaws.com/sumologic/sumocollector_19.99-5_amd64.deb
+                dest=/tmp/sumocollector_19.99-5_amd64.deb mode=0440
 
     - name: Installing SumoLogic Collector
-      command: dpkg -i /tmp/sumocollector_{{ sumo_version }}_amd64.deb
+      command: dpkg -i /tmp/sumocollector_19.99-5_amd64.deb
 
     - name: Downloading collectd
       get_url: url='http://files.celtra.com.s3.amazonaws.com/debian/wheezy/collectd_5.4.1-celtra-7_amd64.deb' dest=/tmp/collectd_5.4.1-celtra-7_amd64.deb
