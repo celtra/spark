@@ -346,6 +346,11 @@ template = ->
                         Value: {Ref: "SlaveScalingGroup"}]
                     ComparisonOperator: 'GreaterThanOrEqualToThreshold'
 
+        Outputs:
+            SparkMaster:
+                Value: {'Fn::Join': [ '.', [ 'master', {Ref: 'clusterName'}, {Ref: 'dnsDomain'} ] ] }
+                Description: "Spark Endpoint, use that as SPARK_MASTER."
+
     stack
 
 console.log JSON.stringify template()
