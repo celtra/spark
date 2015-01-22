@@ -113,7 +113,6 @@ template = ->
                 Default: 'celtra.test'
 
         Resources:
-            # ACL Handled by Resource in IAM policy
             NotificationTopic:
                 Type: 'AWS::SNS::Topic'
                 Properties:
@@ -196,7 +195,6 @@ template = ->
                         Value: { Ref: 'stackOwner' }
                     }]
 
-            ## Cannot tag, cannot set Resource field so we have permission to delete all of them
             MasterSecurityGroupIngress:
                 Type: 'AWS::EC2::SecurityGroupIngress'
                 Properties:
@@ -303,7 +301,13 @@ template = ->
                     SecurityGroups: ['default', {Ref: 'SlaveSecurityGroup'}]
                     InstanceType: {Ref: "slaveInstanceType"}
                     KeyName: {Ref: 'sshKey'}
-                    SpotPrice: {Ref: 'slaveMaxSpotPrice'}
+                    SpotPrice: {
+                        "Fn:If": [
+                            "UseSpotInstances"
+                            "Ref": "slaveMaxSpotPrice"
+                            "Ref": "AWS:NoValue"
+                            ]
+                        }
                     UserData: {'Fn::Base64': {'Fn::Join': [ "", [
                         "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
                         "SERVER_ROLE='slave'\n",

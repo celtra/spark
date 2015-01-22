@@ -63,6 +63,7 @@ slaveAutoScalingMin: "1"
 # Max instances.
 slaveAutoScalingMax: "4"
 # Max Spot price. Check the history and find whatever works for you for your instance type.
+# Set to 0, if you want to use OnDemand.
 slaveMaxSpotPrice: "0.3"
 
 ##
