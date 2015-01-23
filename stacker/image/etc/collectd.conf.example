@@ -22,10 +22,10 @@ LoadPlugin df
 </LoadPlugin>
 #LoadPlugin contextswitch
 #LoadPlugin irq
-#LoadPlugin interface
-#<Plugin interface>
-#	Interface eth0
-#</Plugin>
+LoadPlugin interface
+<Plugin interface>
+	Interface eth0
+</Plugin>
 LoadPlugin memory
 #LoadPlugin processes
 #LoadPlugin vmem
