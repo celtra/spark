@@ -114,7 +114,7 @@ template = ->
 
         Conditions:
             UseOnDemandInstances:
-                "Fn:Equals": [ { "Ref": "slaveMaxSpotPrice" }, "0" ]
+                "Fn::Equals": [ { "Ref": "slaveMaxSpotPrice" }, "0" ]
 
         Resources:
             NotificationTopic:
@@ -306,11 +306,7 @@ template = ->
                     InstanceType: {Ref: "slaveInstanceType"}
                     KeyName: {Ref: 'sshKey'}
                     SpotPrice: {
-                        "Fn:If": [
-                            "UseOnDemandInstances"
-                            "Ref": "AWS:NoValue"
-                            "Ref": "slaveMaxSpotPrice"
-                            ]
+                        "Fn:If": [ "UseOnDemandInstances", { "Ref": "AWS::NoValue" }, { "Ref": "slaveMaxSpotPrice" } ]
                         }
                     UserData: {'Fn::Base64': {'Fn::Join': [ "", [
                         "CLUSTER_NAME=\"", {Ref: "clusterName"}, "\"\n",
