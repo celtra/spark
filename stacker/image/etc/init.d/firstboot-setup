@@ -50,7 +50,7 @@ sources=/etc/sumo.sources
 EOF
 
 # Sed reorders test.celtra.com to com.celtra.test
-METRICS_PREFIX="$(echo ${METRICS_PREFIX}.${CLUSTER_NAME}.${SERVER_ROLE}.${HOSTNAME} | sed -e :a -e 's/\([^\.]*\)\.\([^\.]*\)/\2_\1/;ta;s/_/./g')"
+METRICS_PREFIX="$(echo ${METRICS_PREFIX}.stacks.${CLUSTER_NAME}.${SERVER_ROLE}.${HOSTNAME} | sed -e :a -e 's/\([^\.]*\)\.\([^\.]*\)/\2_\1/;ta;s/_/./g')"
 cat /etc/collectd.conf.example  | \
   sed -e "s/<METRICS_PREFIX>/${METRICS_PREFIX}/" \
       -e "s/<METRICS_ENDPOINT>/${METRICS_ENDPOINT}/" > /etc/collectd.conf

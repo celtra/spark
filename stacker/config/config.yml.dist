@@ -87,4 +87,4 @@ sumoPassword: ""
 ##
 # Add metrics if you want monitoring via monitor.celtra.com.
 metricsEndpoint: "monitor.celtra.com"
-metricsPrefix: "celtra.test.stacks"
+metricsPrefix: "celtra.test"
