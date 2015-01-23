@@ -32,6 +32,28 @@ LoadPlugin memory
 LoadPlugin load
 #LoadPlugin ethstat
 
+LoadPlugin aggregation
+<Plugin "aggregation">
+    <Aggregation>
+        Plugin "cpu"
+        Type "cpu"
+        GroupBy "Host"
+        GroupBy "TypeInstance"
+        SetPlugin "cpu"
+        SetPluginInstance "avg"
+        CalculateAverage true
+    </Aggregation>
+    <Aggregation>
+        Plugin "cpu"
+        Type "cpu"
+        GroupBy "Host"
+        GroupBy "TypeInstance"
+        SetPlugin "cpu"
+        SetPluginInstance "max"
+        CalculateMaximum true
+    </Aggregation>
+</Plugin>
+
 LoadPlugin write_riemann
 <Plugin write_riemann>
     <Node "riemann">
