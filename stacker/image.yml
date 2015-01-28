@@ -26,10 +26,10 @@
       command: dpkg --force-confold -i /tmp/collectd_5.4.1-celtra-7_amd64.deb
 
     - name: Downloading Spark
-      get_url: url='http://files.celtra.com/spark/spark-1.1.0-bin-hadoop2.4-httpclient4.2.tgz' dest='/tmp/spark-1.1.0-bin-hadoop2.4-httpclient4.2.tgz'
+      get_url: url='http://files.celtra-test.com/spark/spark-1.2.0-bin-hadoop2.4.1-httpclient4.2.tgz' dest='/tmp/spark-1.2.0-bin-hadoop2.4.1-httpclient4.2.tgz'
 
     - name: Unpacking Spark
-      shell: mkdir /opt/spark && tar -C /opt/spark --strip-components=1 -xzf /tmp/spark-1.1.0-bin-hadoop2.4-httpclient4.2.tgz
+      shell: mkdir /opt/spark && tar -C /opt/spark --strip-components=1 -xzf /tmp/spark-1.2.0-bin-hadoop2.4.1-httpclient4.2.tgz
 
     - name: Configuring Spark Logging
       command: mv /opt/spark/conf/log4j.properties.template /opt/spark/conf/log4j.properties
